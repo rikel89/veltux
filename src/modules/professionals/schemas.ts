@@ -1,0 +1,26 @@
+import { z } from "zod";
+import { optional, phoneSchema } from "@/lib/validations/common";
+
+/** Colores de agenda disponibles (identifican al profesional en vistas compartidas). */
+export const PROFESSIONAL_COLORS = [
+  { value: "#B8FF65", label: "Lima" },
+  { value: "#60A5FA", label: "Azul" },
+  { value: "#F472B6", label: "Rosa" },
+  { value: "#FBBF24", label: "Ámbar" },
+  { value: "#A78BFA", label: "Violeta" },
+  { value: "#34D399", label: "Esmeralda" },
+  { value: "#F87171", label: "Coral" },
+  { value: "#94A3B8", label: "Pizarra" },
+] as const;
+
+const colorValues = PROFESSIONAL_COLORS.map((c) => c.value) as [string, ...string[]];
+
+export const professionalProfileSchema = z.object({
+  displayName: z.string().trim().min(2, "Mínimo 2 caracteres").max(80),
+  bio: optional(z.string().trim().max(500, "Máximo 500 caracteres")),
+  phone: optional(phoneSchema),
+  color: z.enum(colorValues),
+  acceptsOnlineBooking: z.preprocess((v) => v === "on" || v === "true", z.boolean()),
+});
+
+export type ProfessionalProfileInput = z.infer<typeof professionalProfileSchema>;

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { LogOut, Settings, UserRound } from "lucide-react";
+import { ArrowLeftRight, LogOut, Settings, UserRound } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,10 +11,25 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { initials } from "@/lib/format";
+import { AREA_HOME, AREA_LABEL, type Area } from "@/modules/auth/access-rules";
 
-type Props = { displayName: string; email: string | null; isDemo: boolean };
+type Props = {
+  displayName: string;
+  email: string | null;
+  isDemo: boolean;
+  area: Area;
+  areas: Area[];
+};
 
-export function UserMenu({ displayName, email, isDemo }: Props) {
+const SETTINGS_HREF: Record<Area, string> = {
+  professional: "/profesional/configuracion",
+  owner: "/propietario/configuracion",
+  admin: "/admin/configuracion",
+};
+
+export function UserMenu({ displayName, email, isDemo, area, areas }: Props) {
+  const otherAreas = areas.filter((a) => a !== area);
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
@@ -23,19 +38,33 @@ export function UserMenu({ displayName, email, isDemo }: Props) {
       >
         {initials(displayName)}
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-60">
+      <DropdownMenuContent align="end" className="w-64">
         <DropdownMenuLabel className="font-normal">
           <p className="text-sm font-semibold text-foreground">{displayName}</p>
           <p className="truncate text-xs text-muted-foreground">{isDemo ? "Modo demostración" : email}</p>
         </DropdownMenuLabel>
+        {otherAreas.length > 0 && (
+          <>
+            <DropdownMenuSeparator />
+            {otherAreas.map((a) => (
+              <DropdownMenuItem key={a} asChild>
+                <Link href={AREA_HOME[a]}>
+                  <ArrowLeftRight /> {AREA_LABEL[a]}
+                </Link>
+              </DropdownMenuItem>
+            ))}
+          </>
+        )}
         <DropdownMenuSeparator />
+        {area === "professional" && (
+          <DropdownMenuItem asChild>
+            <Link href="/profesional/perfil">
+              <UserRound /> Mi perfil
+            </Link>
+          </DropdownMenuItem>
+        )}
         <DropdownMenuItem asChild>
-          <Link href="/profesional/perfil">
-            <UserRound /> Mi perfil
-          </Link>
-        </DropdownMenuItem>
-        <DropdownMenuItem asChild>
-          <Link href="/profesional/configuracion">
+          <Link href={SETTINGS_HREF[area]}>
             <Settings /> Configuración
           </Link>
         </DropdownMenuItem>

@@ -1,4 +1,4 @@
-import type { AppointmentStatus } from "@/types/database.types";
+import type { AppointmentStatus } from "@/types/database";
 import { cn } from "@/lib/utils";
 
 const STATUS: Record<AppointmentStatus, { label: string; className: string }> = {

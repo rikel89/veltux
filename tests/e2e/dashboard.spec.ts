@@ -38,3 +38,24 @@ test("la portada muestra la identidad VELTUX", async ({ page }) => {
   await expect(page.getByText("Tu ritmo.").first()).toBeVisible();
   await expect(page.getByRole("link", { name: /Acceder a mi agenda/ })).toHaveAttribute("href", "/login");
 });
+
+test.describe("Acceso", () => {
+  test("el login enlaza con la recuperación de contraseña", async ({ page }) => {
+    await page.goto("/login");
+    await page.getByRole("link", { name: "¿Olvidaste tu contraseña?" }).click();
+    await expect(page).toHaveURL(/\/recuperar$/);
+    await expect(page.getByRole("heading", { name: "Recupera tu acceso" })).toBeVisible();
+  });
+
+  test("un enlace caducado muestra un aviso claro", async ({ page }) => {
+    await page.goto("/login?error=enlace");
+    await expect(page.getByRole("alert").filter({ hasText: "caducado" })).toBeVisible();
+  });
+
+  test("sin roles de propietario o administrador, esas áreas redirigen a la agenda", async ({ page }) => {
+    await page.goto("/admin");
+    await expect(page).toHaveURL(/\/profesional$/);
+    await page.goto("/propietario");
+    await expect(page).toHaveURL(/\/profesional$/);
+  });
+});

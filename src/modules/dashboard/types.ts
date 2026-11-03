@@ -1,4 +1,4 @@
-import type { AppointmentStatus } from "@/types/database.types";
+import type { AppointmentStatus } from "@/types/database";
 import type { DayOccupancy } from "@/modules/scheduling/occupancy";
 
 export type DashboardAppointment = {

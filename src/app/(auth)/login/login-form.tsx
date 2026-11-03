@@ -1,67 +1,54 @@
 "use client";
 
+import Link from "next/link";
 import { useActionState } from "react";
 import { useSearchParams } from "next/navigation";
-import { LoaderCircle } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { FormField } from "@/components/forms/form-field";
+import { FormMessage, SubmitButton } from "@/components/forms/form-status";
 import { signIn } from "@/modules/auth/actions";
 import type { SignInState } from "@/modules/auth/schemas";
 
+const LINK_ERRORS: Record<string, string> = {
+  enlace: "El enlace ha caducado o ya se utilizó. Solicita uno nuevo.",
+  auth: "No se pudo completar el acceso. Inténtalo de nuevo.",
+};
+
 export function LoginForm() {
-  const next = useSearchParams().get("next") ?? "";
-  const [state, action, pending] = useActionState<SignInState, FormData>(signIn, {});
+  const params = useSearchParams();
+  const next = params.get("next") ?? "";
+  const linkError = LINK_ERRORS[params.get("error") ?? ""];
+  const [state, action] = useActionState<SignInState, FormData>(signIn, {});
 
   return (
     <form action={action} className="space-y-5" noValidate>
+      {linkError && !state.error && <FormMessage state={{ error: linkError }} />}
       <input type="hidden" name="next" value={next} />
+      <FormField
+        name="email"
+        label="Email"
+        type="email"
+        autoComplete="email"
+        inputMode="email"
+        required
+        error={state.fieldErrors?.email}
+      />
       <div className="space-y-2">
-        <Label htmlFor="email">Email</Label>
-        <Input
-          id="email"
-          name="email"
-          type="email"
-          autoComplete="email"
-          inputMode="email"
-          required
-          className="h-12 rounded-xl bg-white px-4 text-base"
-          aria-invalid={Boolean(state.fieldErrors?.email)}
-          aria-describedby={state.fieldErrors?.email ? "email-error" : undefined}
-        />
-        {state.fieldErrors?.email && (
-          <p id="email-error" className="text-xs text-destructive">
-            {state.fieldErrors.email}
-          </p>
-        )}
-      </div>
-      <div className="space-y-2">
-        <Label htmlFor="password">Contraseña</Label>
-        <Input
-          id="password"
+        <FormField
           name="password"
+          label="Contraseña"
           type="password"
           autoComplete="current-password"
           required
-          className="h-12 rounded-xl bg-white px-4 text-base"
-          aria-invalid={Boolean(state.fieldErrors?.password)}
-          aria-describedby={state.fieldErrors?.password ? "password-error" : undefined}
+          error={state.fieldErrors?.password}
         />
-        {state.fieldErrors?.password && (
-          <p id="password-error" className="text-xs text-destructive">
-            {state.fieldErrors.password}
-          </p>
-        )}
+        <div className="text-right">
+          <Link href="/recuperar" className="text-xs font-semibold text-lime-ink hover:underline">
+            ¿Olvidaste tu contraseña?
+          </Link>
+        </div>
       </div>
-      {state.error && (
-        <p role="alert" className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">
-          {state.error}
-        </p>
-      )}
-      <Button type="submit" size="lg" className="h-12 w-full text-base shadow-lime" disabled={pending}>
-        {pending && <LoaderCircle className="animate-spin" />}
-        Entrar
-      </Button>
+      <FormMessage state={state} />
+      <SubmitButton className="w-full text-base">Entrar</SubmitButton>
     </form>
   );
 }

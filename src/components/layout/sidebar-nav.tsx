@@ -3,17 +3,18 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { isNavItemActive, PROFESSIONAL_NAV } from "./nav-config";
+import type { Area } from "@/modules/auth/access-rules";
+import { CURRENT_SPRINT, isNavItemActive, NAVS } from "./nav-config";
 
-// Los iconos son componentes: la lista se importa aquí, no se pasa desde el servidor.
-type Props = { onNavigate?: () => void };
+// Los iconos son componentes: la lista se resuelve aquí a partir del área, no se pasa desde el servidor.
+type Props = { area: Area; onNavigate?: () => void };
 
-export function SidebarNav({ onNavigate }: Props) {
+export function SidebarNav({ area, onNavigate }: Props) {
   const pathname = usePathname();
 
   return (
     <nav aria-label="Navegación principal" className="flex flex-col gap-1">
-      {PROFESSIONAL_NAV.map((item) => {
+      {NAVS[area].items.map((item) => {
         const active = isNavItemActive(pathname, item.href);
         const Icon = item.icon;
         return (
@@ -31,7 +32,7 @@ export function SidebarNav({ onNavigate }: Props) {
           >
             <Icon className={cn("size-[18px]", active ? "text-graphite" : "text-neutral-500 group-hover:text-lime")} />
             <span className="flex-1">{item.label}</span>
-            {item.sprint > 0 && !active && (
+            {item.sprint > CURRENT_SPRINT && !active && (
               <span className="rounded-md bg-white/5 px-1.5 py-0.5 text-[10px] font-semibold text-neutral-500">
                 S{item.sprint}
               </span>

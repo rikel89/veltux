@@ -8,6 +8,9 @@ describe("rutas protegidas", () => {
     expect(isProtectedPath("/profesional/agenda")).toBe(true);
     expect(isProtectedPath("/propietario")).toBe(true);
     expect(isProtectedPath("/admin/salones")).toBe(true);
+    expect(isProtectedPath("/panel")).toBe(true);
+    expect(isProtectedPath("/cuenta/contrasena")).toBe(true);
+    expect(isProtectedPath("/recuperar")).toBe(false);
     expect(isProtectedPath("/")).toBe(false);
     expect(isProtectedPath("/login")).toBe(false);
     expect(isProtectedPath("/barberia-elegance")).toBe(false);
@@ -16,10 +19,10 @@ describe("rutas protegidas", () => {
 
   it("evita redirecciones abiertas tras el login", () => {
     expect(safeRedirectPath("/profesional/agenda")).toBe("/profesional/agenda");
-    expect(safeRedirectPath("https://evil.example")).toBe("/profesional");
-    expect(safeRedirectPath("//evil.example")).toBe("/profesional");
-    expect(safeRedirectPath("/\\evil.example")).toBe("/profesional");
-    expect(safeRedirectPath(null)).toBe("/profesional");
+    expect(safeRedirectPath("https://evil.example")).toBe("/panel");
+    expect(safeRedirectPath("//evil.example")).toBe("/panel");
+    expect(safeRedirectPath("/\\evil.example")).toBe("/panel");
+    expect(safeRedirectPath(null)).toBe("/panel");
   });
 });
 

@@ -1,358 +1,1387 @@
-/**
- * PROVISIONAL · escrito a mano a partir de la migración inicial.
- *
- * Se sustituirá por el archivo generado con `npm run db:types`
- * (supabase gen types) en cuanto el Supabase local esté levantado.
- * No añadir lógica en este archivo.
- */
-
-export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[];
-
-type Timestamp = string;
-type Uuid = string;
-
-type Table<Row extends Record<string, unknown>, Required extends keyof Row> = {
-  Row: Row;
-  Insert: Pick<Row, Required> & Partial<Row>;
-  Update: Partial<Row>;
-  Relationships: [];
-};
-
-type Timestamps = { created_at: Timestamp; updated_at: Timestamp };
-
-export type PlatformRole = "user" | "admin";
-export type SalonKind = "barberia" | "peluqueria" | "unisex";
-export type SalonStatus = "trial" | "active" | "suspended" | "cancelled";
-export type MembershipRole = "owner" | "professional";
-export type MembershipStatus = "invited" | "active" | "disabled";
-export type ProfessionalStatus = "invited" | "active" | "inactive";
-export type ScheduleExceptionType = "block" | "break" | "day_off" | "extra_availability";
-export type AppointmentStatus = "pending" | "confirmed" | "cancelled" | "completed" | "no_show";
-export type AppointmentSource = "professional" | "public_portal" | "reassignment";
-export type AppointmentEventType =
-  | "created"
-  | "updated"
-  | "confirmed"
-  | "rescheduled"
-  | "cancelled"
-  | "reassigned"
-  | "completed"
-  | "no_show";
-export type ActorKind = "professional" | "owner" | "client" | "system";
-export type IncidentStatus = "open" | "resolved" | "cancelled";
-export type ChangeRequestType = "reschedule" | "reassignment";
-export type ChangeRequestStatus =
-  | "pending_target"
-  | "pending_client"
-  | "accepted"
-  | "rejected"
-  | "expired"
-  | "cancelled"
-  | "applied";
-export type NotificationChannel = "sms" | "email" | "in_app";
-export type NotificationStatus = "pending" | "processing" | "sent" | "delivered" | "failed";
-export type SubscriptionStatus = "trialing" | "active" | "past_due" | "paused" | "cancelled";
-
-type ProfileRow = Timestamps & {
-  id: Uuid;
-  full_name: string;
-  phone: string | null;
-  avatar_url: string | null;
-  platform_role: PlatformRole;
-};
-
-type SalonRow = Timestamps & {
-  id: Uuid;
-  slug: string;
-  name: string;
-  kind: SalonKind;
-  status: SalonStatus;
-  timezone: string;
-  phone: string | null;
-  email: string | null;
-  address_line: string | null;
-  city: string | null;
-  postal_code: string | null;
-  country: string;
-  created_by: Uuid | null;
-};
-
-type SalonMembershipRow = Timestamps & {
-  id: Uuid;
-  salon_id: Uuid;
-  user_id: Uuid;
-  role: MembershipRole;
-  status: MembershipStatus;
-};
-
-type ProfessionalRow = Timestamps & {
-  id: Uuid;
-  salon_id: Uuid;
-  user_id: Uuid | null;
-  display_name: string;
-  slug: string;
-  bio: string | null;
-  avatar_url: string | null;
-  phone: string | null;
-  email: string | null;
-  color: string;
-  status: ProfessionalStatus;
-  accepts_online_booking: boolean;
-  sort_order: number;
-};
-
-type SubscriptionRow = Timestamps & {
-  id: Uuid;
-  salon_id: Uuid;
-  plan: string;
-  status: SubscriptionStatus;
-  license_quantity: number;
-  trial_ends_at: Timestamp | null;
-  current_period_start: Timestamp | null;
-  current_period_end: Timestamp | null;
-  stripe_customer_id: string | null;
-  stripe_subscription_id: string | null;
-};
-
-type LicenseAssignmentRow = {
-  id: Uuid;
-  salon_id: Uuid;
-  professional_id: Uuid;
-  assigned_by: Uuid | null;
-  assigned_at: Timestamp;
-  revoked_at: Timestamp | null;
-  revoked_by: Uuid | null;
-  revoke_reason: string | null;
-};
-
-type ServiceRow = Timestamps & {
-  id: Uuid;
-  salon_id: Uuid;
-  professional_id: Uuid;
-  name: string;
-  description: string | null;
-  duration_minutes: number;
-  buffer_after_minutes: number;
-  price_cents: number;
-  currency: string;
-  is_active: boolean;
-  is_public: boolean;
-  sort_order: number;
-};
-
-type WorkScheduleRow = Timestamps & {
-  id: Uuid;
-  salon_id: Uuid;
-  professional_id: Uuid;
-  weekday: number;
-  start_time: string;
-  end_time: string;
-  valid_from: string;
-  valid_until: string | null;
-};
-
-type ScheduleIncidentRow = Timestamps & {
-  id: Uuid;
-  salon_id: Uuid;
-  professional_id: Uuid;
-  incident_date: string;
-  starts_at: Timestamp;
-  ends_at: Timestamp;
-  reason: string | null;
-  status: IncidentStatus;
-  created_by: Uuid | null;
-  resolved_at: Timestamp | null;
-};
-
-type ScheduleExceptionRow = Timestamps & {
-  id: Uuid;
-  salon_id: Uuid;
-  professional_id: Uuid;
-  type: ScheduleExceptionType;
-  starts_at: Timestamp;
-  ends_at: Timestamp;
-  reason: string | null;
-  incident_id: Uuid | null;
-  created_by: Uuid | null;
-};
-
-type ClientRow = Timestamps & {
-  id: Uuid;
-  salon_id: Uuid;
-  professional_id: Uuid;
-  full_name: string;
-  phone: string;
-  phone_verified_at: Timestamp | null;
-  email: string | null;
-  notes: string | null;
-  marketing_consent: boolean;
-  global_client_id: Uuid | null;
-  archived_at: Timestamp | null;
-};
-
-type AppointmentRow = Timestamps & {
-  id: Uuid;
-  salon_id: Uuid;
-  professional_id: Uuid;
-  client_id: Uuid;
-  service_id: Uuid;
-  starts_at: Timestamp;
-  ends_at: Timestamp;
-  status: AppointmentStatus;
-  source: AppointmentSource;
-  service_name: string;
-  price_cents: number;
-  currency: string;
-  notes: string | null;
-  cancelled_at: Timestamp | null;
-  cancel_reason: string | null;
-  created_by: Uuid | null;
-};
-
-type AppointmentEventRow = {
-  id: Uuid;
-  appointment_id: Uuid;
-  salon_id: Uuid;
-  professional_id: Uuid;
-  event_type: AppointmentEventType;
-  actor_user_id: Uuid | null;
-  actor_kind: ActorKind;
-  payload: Json;
-  created_at: Timestamp;
-};
-
-type AppointmentChangeRequestRow = Timestamps & {
-  id: Uuid;
-  salon_id: Uuid;
-  appointment_id: Uuid;
-  incident_id: Uuid | null;
-  type: ChangeRequestType;
-  status: ChangeRequestStatus;
-  requested_by_professional_id: Uuid;
-  target_professional_id: Uuid | null;
-  proposed_starts_at: Timestamp;
-  proposed_ends_at: Timestamp;
-  proposed_service_id: Uuid | null;
-  proposed_price_cents: number | null;
-  message: string | null;
-  target_responded_at: Timestamp | null;
-  client_responded_at: Timestamp | null;
-  client_token_hash: string | null;
-  expires_at: Timestamp;
-};
-
-type NotificationRow = Timestamps & {
-  id: Uuid;
-  salon_id: Uuid;
-  professional_id: Uuid | null;
-  appointment_id: Uuid | null;
-  channel: NotificationChannel;
-  status: NotificationStatus;
-  template: string;
-  recipient_phone: string | null;
-  recipient_user_id: Uuid | null;
-  payload: Json;
-  idempotency_key: string;
-  attempts: number;
-  max_attempts: number;
-  next_attempt_at: Timestamp;
-  locked_at: Timestamp | null;
-  provider: string | null;
-  provider_message_id: string | null;
-  last_error: string | null;
-  sent_at: Timestamp | null;
-  delivered_at: Timestamp | null;
-  failed_at: Timestamp | null;
-};
-
-type AuditLogRow = {
-  id: number;
-  salon_id: Uuid | null;
-  actor_user_id: Uuid | null;
-  action: string;
-  entity_type: string;
-  entity_id: Uuid | null;
-  metadata: Json;
-  created_at: Timestamp;
-};
+export type Json =
+  | string
+  | number
+  | boolean
+  | null
+  | { [key: string]: Json | undefined }
+  | Json[]
 
 export type Database = {
+  // Allows to automatically instantiate createClient with right options
+  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
+  __InternalSupabase: {
+    PostgrestVersion: "14.18"
+  }
+  graphql_public: {
+    Tables: {
+      [_ in never]: never
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      graphql: {
+        Args: {
+          extensions?: Json
+          operationName?: string
+          query?: string
+          variables?: Json
+        }
+        Returns: Json
+      }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
   public: {
     Tables: {
-      profiles: Table<ProfileRow, "id">;
-      salons: Table<SalonRow, "slug" | "name">;
-      salon_memberships: Table<SalonMembershipRow, "salon_id" | "user_id" | "role">;
-      professionals: Table<ProfessionalRow, "salon_id" | "display_name" | "slug">;
-      subscriptions: Table<SubscriptionRow, "salon_id">;
-      license_assignments: Table<LicenseAssignmentRow, "salon_id" | "professional_id">;
-      services: Table<
-        ServiceRow,
-        "salon_id" | "professional_id" | "name" | "duration_minutes" | "price_cents"
-      >;
-      work_schedules: Table<
-        WorkScheduleRow,
-        "salon_id" | "professional_id" | "weekday" | "start_time" | "end_time"
-      >;
-      schedule_incidents: Table<
-        ScheduleIncidentRow,
-        "salon_id" | "professional_id" | "incident_date" | "starts_at" | "ends_at"
-      >;
-      schedule_exceptions: Table<
-        ScheduleExceptionRow,
-        "salon_id" | "professional_id" | "type" | "starts_at" | "ends_at"
-      >;
-      clients: Table<ClientRow, "salon_id" | "professional_id" | "full_name" | "phone">;
-      appointments: Table<
-        AppointmentRow,
-        "salon_id" | "professional_id" | "client_id" | "service_id" | "starts_at" | "ends_at"
-      >;
-      appointment_events: Table<
-        AppointmentEventRow,
-        "appointment_id" | "salon_id" | "professional_id" | "event_type"
-      >;
-      appointment_change_requests: Table<
-        AppointmentChangeRequestRow,
-        | "salon_id"
-        | "appointment_id"
-        | "type"
-        | "status"
-        | "requested_by_professional_id"
-        | "proposed_starts_at"
-        | "proposed_ends_at"
-      >;
-      notifications: Table<NotificationRow, "salon_id" | "template" | "idempotency_key">;
-      audit_logs: Table<AuditLogRow, "action" | "entity_type">;
-    };
-    Views: Record<string, never>;
+      appointment_change_requests: {
+        Row: {
+          appointment_id: string
+          client_responded_at: string | null
+          client_token_hash: string | null
+          created_at: string
+          expires_at: string
+          id: string
+          incident_id: string | null
+          message: string | null
+          proposed_ends_at: string
+          proposed_price_cents: number | null
+          proposed_service_id: string | null
+          proposed_starts_at: string
+          requested_by_professional_id: string
+          salon_id: string
+          status: Database["public"]["Enums"]["change_request_status"]
+          target_professional_id: string | null
+          target_responded_at: string | null
+          type: Database["public"]["Enums"]["change_request_type"]
+          updated_at: string
+        }
+        Insert: {
+          appointment_id: string
+          client_responded_at?: string | null
+          client_token_hash?: string | null
+          created_at?: string
+          expires_at?: string
+          id?: string
+          incident_id?: string | null
+          message?: string | null
+          proposed_ends_at: string
+          proposed_price_cents?: number | null
+          proposed_service_id?: string | null
+          proposed_starts_at: string
+          requested_by_professional_id: string
+          salon_id: string
+          status: Database["public"]["Enums"]["change_request_status"]
+          target_professional_id?: string | null
+          target_responded_at?: string | null
+          type: Database["public"]["Enums"]["change_request_type"]
+          updated_at?: string
+        }
+        Update: {
+          appointment_id?: string
+          client_responded_at?: string | null
+          client_token_hash?: string | null
+          created_at?: string
+          expires_at?: string
+          id?: string
+          incident_id?: string | null
+          message?: string | null
+          proposed_ends_at?: string
+          proposed_price_cents?: number | null
+          proposed_service_id?: string | null
+          proposed_starts_at?: string
+          requested_by_professional_id?: string
+          salon_id?: string
+          status?: Database["public"]["Enums"]["change_request_status"]
+          target_professional_id?: string | null
+          target_responded_at?: string | null
+          type?: Database["public"]["Enums"]["change_request_type"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "appointment_change_requests_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: false
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "appointment_change_requests_incident_id_fkey"
+            columns: ["incident_id"]
+            isOneToOne: false
+            referencedRelation: "schedule_incidents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "appointment_change_requests_proposed_service_id_fkey"
+            columns: ["proposed_service_id"]
+            isOneToOne: false
+            referencedRelation: "services"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "appointment_change_requests_requested_by_professional_id_fkey"
+            columns: ["requested_by_professional_id"]
+            isOneToOne: false
+            referencedRelation: "professionals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "appointment_change_requests_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "salons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "appointment_change_requests_target_professional_id_fkey"
+            columns: ["target_professional_id"]
+            isOneToOne: false
+            referencedRelation: "professionals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      appointment_events: {
+        Row: {
+          actor_kind: Database["public"]["Enums"]["actor_kind"]
+          actor_user_id: string | null
+          appointment_id: string
+          created_at: string
+          event_type: Database["public"]["Enums"]["appointment_event_type"]
+          id: string
+          payload: Json
+          professional_id: string
+          salon_id: string
+        }
+        Insert: {
+          actor_kind?: Database["public"]["Enums"]["actor_kind"]
+          actor_user_id?: string | null
+          appointment_id: string
+          created_at?: string
+          event_type: Database["public"]["Enums"]["appointment_event_type"]
+          id?: string
+          payload?: Json
+          professional_id: string
+          salon_id: string
+        }
+        Update: {
+          actor_kind?: Database["public"]["Enums"]["actor_kind"]
+          actor_user_id?: string | null
+          appointment_id?: string
+          created_at?: string
+          event_type?: Database["public"]["Enums"]["appointment_event_type"]
+          id?: string
+          payload?: Json
+          professional_id?: string
+          salon_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "appointment_events_actor_user_id_fkey"
+            columns: ["actor_user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "appointment_events_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: false
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "appointment_events_professional_id_fkey"
+            columns: ["professional_id"]
+            isOneToOne: false
+            referencedRelation: "professionals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "appointment_events_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "salons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      appointments: {
+        Row: {
+          cancel_reason: string | null
+          cancelled_at: string | null
+          client_id: string
+          created_at: string
+          created_by: string | null
+          currency: string
+          ends_at: string
+          id: string
+          notes: string | null
+          price_cents: number
+          professional_id: string
+          salon_id: string
+          service_id: string
+          service_name: string
+          source: Database["public"]["Enums"]["appointment_source"]
+          starts_at: string
+          status: Database["public"]["Enums"]["appointment_status"]
+          updated_at: string
+        }
+        Insert: {
+          cancel_reason?: string | null
+          cancelled_at?: string | null
+          client_id: string
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          ends_at: string
+          id?: string
+          notes?: string | null
+          price_cents?: number
+          professional_id: string
+          salon_id: string
+          service_id: string
+          service_name?: string
+          source?: Database["public"]["Enums"]["appointment_source"]
+          starts_at: string
+          status?: Database["public"]["Enums"]["appointment_status"]
+          updated_at?: string
+        }
+        Update: {
+          cancel_reason?: string | null
+          cancelled_at?: string | null
+          client_id?: string
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          ends_at?: string
+          id?: string
+          notes?: string | null
+          price_cents?: number
+          professional_id?: string
+          salon_id?: string
+          service_id?: string
+          service_name?: string
+          source?: Database["public"]["Enums"]["appointment_source"]
+          starts_at?: string
+          status?: Database["public"]["Enums"]["appointment_status"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "appointments_client_id_professional_id_fkey"
+            columns: ["client_id", "professional_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id", "professional_id"]
+          },
+          {
+            foreignKeyName: "appointments_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "appointments_professional_id_salon_id_fkey"
+            columns: ["professional_id", "salon_id"]
+            isOneToOne: false
+            referencedRelation: "professionals"
+            referencedColumns: ["id", "salon_id"]
+          },
+          {
+            foreignKeyName: "appointments_service_id_professional_id_fkey"
+            columns: ["service_id", "professional_id"]
+            isOneToOne: false
+            referencedRelation: "services"
+            referencedColumns: ["id", "professional_id"]
+          },
+        ]
+      }
+      audit_logs: {
+        Row: {
+          action: string
+          actor_user_id: string | null
+          created_at: string
+          entity_id: string | null
+          entity_type: string
+          id: number
+          metadata: Json
+          salon_id: string | null
+        }
+        Insert: {
+          action: string
+          actor_user_id?: string | null
+          created_at?: string
+          entity_id?: string | null
+          entity_type: string
+          id?: never
+          metadata?: Json
+          salon_id?: string | null
+        }
+        Update: {
+          action?: string
+          actor_user_id?: string | null
+          created_at?: string
+          entity_id?: string | null
+          entity_type?: string
+          id?: never
+          metadata?: Json
+          salon_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "audit_logs_actor_user_id_fkey"
+            columns: ["actor_user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "audit_logs_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "salons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      clients: {
+        Row: {
+          archived_at: string | null
+          created_at: string
+          email: string | null
+          full_name: string
+          global_client_id: string | null
+          id: string
+          marketing_consent: boolean
+          notes: string | null
+          phone: string
+          phone_verified_at: string | null
+          professional_id: string
+          salon_id: string
+          updated_at: string
+        }
+        Insert: {
+          archived_at?: string | null
+          created_at?: string
+          email?: string | null
+          full_name: string
+          global_client_id?: string | null
+          id?: string
+          marketing_consent?: boolean
+          notes?: string | null
+          phone: string
+          phone_verified_at?: string | null
+          professional_id: string
+          salon_id: string
+          updated_at?: string
+        }
+        Update: {
+          archived_at?: string | null
+          created_at?: string
+          email?: string | null
+          full_name?: string
+          global_client_id?: string | null
+          id?: string
+          marketing_consent?: boolean
+          notes?: string | null
+          phone?: string
+          phone_verified_at?: string | null
+          professional_id?: string
+          salon_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "clients_professional_id_salon_id_fkey"
+            columns: ["professional_id", "salon_id"]
+            isOneToOne: false
+            referencedRelation: "professionals"
+            referencedColumns: ["id", "salon_id"]
+          },
+        ]
+      }
+      license_assignments: {
+        Row: {
+          assigned_at: string
+          assigned_by: string | null
+          id: string
+          professional_id: string
+          revoke_reason: string | null
+          revoked_at: string | null
+          revoked_by: string | null
+          salon_id: string
+        }
+        Insert: {
+          assigned_at?: string
+          assigned_by?: string | null
+          id?: string
+          professional_id: string
+          revoke_reason?: string | null
+          revoked_at?: string | null
+          revoked_by?: string | null
+          salon_id: string
+        }
+        Update: {
+          assigned_at?: string
+          assigned_by?: string | null
+          id?: string
+          professional_id?: string
+          revoke_reason?: string | null
+          revoked_at?: string | null
+          revoked_by?: string | null
+          salon_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "license_assignments_assigned_by_fkey"
+            columns: ["assigned_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "license_assignments_professional_id_salon_id_fkey"
+            columns: ["professional_id", "salon_id"]
+            isOneToOne: false
+            referencedRelation: "professionals"
+            referencedColumns: ["id", "salon_id"]
+          },
+          {
+            foreignKeyName: "license_assignments_revoked_by_fkey"
+            columns: ["revoked_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notifications: {
+        Row: {
+          appointment_id: string | null
+          attempts: number
+          channel: Database["public"]["Enums"]["notification_channel"]
+          created_at: string
+          delivered_at: string | null
+          failed_at: string | null
+          id: string
+          idempotency_key: string
+          last_error: string | null
+          locked_at: string | null
+          max_attempts: number
+          next_attempt_at: string
+          payload: Json
+          professional_id: string | null
+          provider: string | null
+          provider_message_id: string | null
+          recipient_phone: string | null
+          recipient_user_id: string | null
+          salon_id: string
+          sent_at: string | null
+          status: Database["public"]["Enums"]["notification_status"]
+          template: string
+          updated_at: string
+        }
+        Insert: {
+          appointment_id?: string | null
+          attempts?: number
+          channel?: Database["public"]["Enums"]["notification_channel"]
+          created_at?: string
+          delivered_at?: string | null
+          failed_at?: string | null
+          id?: string
+          idempotency_key: string
+          last_error?: string | null
+          locked_at?: string | null
+          max_attempts?: number
+          next_attempt_at?: string
+          payload?: Json
+          professional_id?: string | null
+          provider?: string | null
+          provider_message_id?: string | null
+          recipient_phone?: string | null
+          recipient_user_id?: string | null
+          salon_id: string
+          sent_at?: string | null
+          status?: Database["public"]["Enums"]["notification_status"]
+          template: string
+          updated_at?: string
+        }
+        Update: {
+          appointment_id?: string | null
+          attempts?: number
+          channel?: Database["public"]["Enums"]["notification_channel"]
+          created_at?: string
+          delivered_at?: string | null
+          failed_at?: string | null
+          id?: string
+          idempotency_key?: string
+          last_error?: string | null
+          locked_at?: string | null
+          max_attempts?: number
+          next_attempt_at?: string
+          payload?: Json
+          professional_id?: string | null
+          provider?: string | null
+          provider_message_id?: string | null
+          recipient_phone?: string | null
+          recipient_user_id?: string | null
+          salon_id?: string
+          sent_at?: string | null
+          status?: Database["public"]["Enums"]["notification_status"]
+          template?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: false
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notifications_professional_id_fkey"
+            columns: ["professional_id"]
+            isOneToOne: false
+            referencedRelation: "professionals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notifications_recipient_user_id_fkey"
+            columns: ["recipient_user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notifications_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "salons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      professionals: {
+        Row: {
+          accepts_online_booking: boolean
+          avatar_url: string | null
+          bio: string | null
+          color: string
+          created_at: string
+          display_name: string
+          email: string | null
+          id: string
+          phone: string | null
+          salon_id: string
+          slug: string
+          sort_order: number
+          status: Database["public"]["Enums"]["professional_status"]
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          accepts_online_booking?: boolean
+          avatar_url?: string | null
+          bio?: string | null
+          color?: string
+          created_at?: string
+          display_name: string
+          email?: string | null
+          id?: string
+          phone?: string | null
+          salon_id: string
+          slug: string
+          sort_order?: number
+          status?: Database["public"]["Enums"]["professional_status"]
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          accepts_online_booking?: boolean
+          avatar_url?: string | null
+          bio?: string | null
+          color?: string
+          created_at?: string
+          display_name?: string
+          email?: string | null
+          id?: string
+          phone?: string | null
+          salon_id?: string
+          slug?: string
+          sort_order?: number
+          status?: Database["public"]["Enums"]["professional_status"]
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "professionals_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "salons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "professionals_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          full_name: string
+          id: string
+          phone: string | null
+          platform_role: Database["public"]["Enums"]["platform_role"]
+          updated_at: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          full_name?: string
+          id: string
+          phone?: string | null
+          platform_role?: Database["public"]["Enums"]["platform_role"]
+          updated_at?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          full_name?: string
+          id?: string
+          phone?: string | null
+          platform_role?: Database["public"]["Enums"]["platform_role"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      salon_memberships: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["membership_role"]
+          salon_id: string
+          status: Database["public"]["Enums"]["membership_status"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["membership_role"]
+          salon_id: string
+          status?: Database["public"]["Enums"]["membership_status"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["membership_role"]
+          salon_id?: string
+          status?: Database["public"]["Enums"]["membership_status"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "salon_memberships_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "salons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "salon_memberships_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      salons: {
+        Row: {
+          address_line: string | null
+          city: string | null
+          country: string
+          created_at: string
+          created_by: string | null
+          email: string | null
+          id: string
+          kind: Database["public"]["Enums"]["salon_kind"]
+          name: string
+          phone: string | null
+          postal_code: string | null
+          slug: string
+          status: Database["public"]["Enums"]["salon_status"]
+          timezone: string
+          updated_at: string
+        }
+        Insert: {
+          address_line?: string | null
+          city?: string | null
+          country?: string
+          created_at?: string
+          created_by?: string | null
+          email?: string | null
+          id?: string
+          kind?: Database["public"]["Enums"]["salon_kind"]
+          name: string
+          phone?: string | null
+          postal_code?: string | null
+          slug: string
+          status?: Database["public"]["Enums"]["salon_status"]
+          timezone?: string
+          updated_at?: string
+        }
+        Update: {
+          address_line?: string | null
+          city?: string | null
+          country?: string
+          created_at?: string
+          created_by?: string | null
+          email?: string | null
+          id?: string
+          kind?: Database["public"]["Enums"]["salon_kind"]
+          name?: string
+          phone?: string | null
+          postal_code?: string | null
+          slug?: string
+          status?: Database["public"]["Enums"]["salon_status"]
+          timezone?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "salons_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      schedule_exceptions: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          ends_at: string
+          id: string
+          incident_id: string | null
+          professional_id: string
+          reason: string | null
+          salon_id: string
+          starts_at: string
+          type: Database["public"]["Enums"]["schedule_exception_type"]
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          ends_at: string
+          id?: string
+          incident_id?: string | null
+          professional_id: string
+          reason?: string | null
+          salon_id: string
+          starts_at: string
+          type: Database["public"]["Enums"]["schedule_exception_type"]
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          ends_at?: string
+          id?: string
+          incident_id?: string | null
+          professional_id?: string
+          reason?: string | null
+          salon_id?: string
+          starts_at?: string
+          type?: Database["public"]["Enums"]["schedule_exception_type"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "schedule_exceptions_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "schedule_exceptions_incident_id_fkey"
+            columns: ["incident_id"]
+            isOneToOne: false
+            referencedRelation: "schedule_incidents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "schedule_exceptions_professional_id_salon_id_fkey"
+            columns: ["professional_id", "salon_id"]
+            isOneToOne: false
+            referencedRelation: "professionals"
+            referencedColumns: ["id", "salon_id"]
+          },
+        ]
+      }
+      schedule_incidents: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          ends_at: string
+          id: string
+          incident_date: string
+          professional_id: string
+          reason: string | null
+          resolved_at: string | null
+          salon_id: string
+          starts_at: string
+          status: Database["public"]["Enums"]["incident_status"]
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          ends_at: string
+          id?: string
+          incident_date: string
+          professional_id: string
+          reason?: string | null
+          resolved_at?: string | null
+          salon_id: string
+          starts_at: string
+          status?: Database["public"]["Enums"]["incident_status"]
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          ends_at?: string
+          id?: string
+          incident_date?: string
+          professional_id?: string
+          reason?: string | null
+          resolved_at?: string | null
+          salon_id?: string
+          starts_at?: string
+          status?: Database["public"]["Enums"]["incident_status"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "schedule_incidents_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "schedule_incidents_professional_id_salon_id_fkey"
+            columns: ["professional_id", "salon_id"]
+            isOneToOne: false
+            referencedRelation: "professionals"
+            referencedColumns: ["id", "salon_id"]
+          },
+        ]
+      }
+      services: {
+        Row: {
+          buffer_after_minutes: number
+          created_at: string
+          currency: string
+          description: string | null
+          duration_minutes: number
+          id: string
+          is_active: boolean
+          is_public: boolean
+          name: string
+          price_cents: number
+          professional_id: string
+          salon_id: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          buffer_after_minutes?: number
+          created_at?: string
+          currency?: string
+          description?: string | null
+          duration_minutes: number
+          id?: string
+          is_active?: boolean
+          is_public?: boolean
+          name: string
+          price_cents: number
+          professional_id: string
+          salon_id: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          buffer_after_minutes?: number
+          created_at?: string
+          currency?: string
+          description?: string | null
+          duration_minutes?: number
+          id?: string
+          is_active?: boolean
+          is_public?: boolean
+          name?: string
+          price_cents?: number
+          professional_id?: string
+          salon_id?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "services_professional_id_salon_id_fkey"
+            columns: ["professional_id", "salon_id"]
+            isOneToOne: false
+            referencedRelation: "professionals"
+            referencedColumns: ["id", "salon_id"]
+          },
+        ]
+      }
+      subscriptions: {
+        Row: {
+          created_at: string
+          current_period_end: string | null
+          current_period_start: string | null
+          id: string
+          license_quantity: number
+          plan: string
+          salon_id: string
+          status: Database["public"]["Enums"]["subscription_status"]
+          stripe_customer_id: string | null
+          stripe_subscription_id: string | null
+          trial_ends_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          current_period_end?: string | null
+          current_period_start?: string | null
+          id?: string
+          license_quantity?: number
+          plan?: string
+          salon_id: string
+          status?: Database["public"]["Enums"]["subscription_status"]
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          trial_ends_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          current_period_end?: string | null
+          current_period_start?: string | null
+          id?: string
+          license_quantity?: number
+          plan?: string
+          salon_id?: string
+          status?: Database["public"]["Enums"]["subscription_status"]
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          trial_ends_at?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subscriptions_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: true
+            referencedRelation: "salons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      work_schedules: {
+        Row: {
+          created_at: string
+          end_time: string
+          id: string
+          professional_id: string
+          salon_id: string
+          start_time: string
+          updated_at: string
+          valid_from: string
+          valid_until: string | null
+          weekday: number
+        }
+        Insert: {
+          created_at?: string
+          end_time: string
+          id?: string
+          professional_id: string
+          salon_id: string
+          start_time: string
+          updated_at?: string
+          valid_from?: string
+          valid_until?: string | null
+          weekday: number
+        }
+        Update: {
+          created_at?: string
+          end_time?: string
+          id?: string
+          professional_id?: string
+          salon_id?: string
+          start_time?: string
+          updated_at?: string
+          valid_from?: string
+          valid_until?: string | null
+          weekday?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "work_schedules_professional_id_salon_id_fkey"
+            columns: ["professional_id", "salon_id"]
+            isOneToOne: false
+            referencedRelation: "professionals"
+            referencedColumns: ["id", "salon_id"]
+          },
+        ]
+      }
+    }
+    Views: {
+      [_ in never]: never
+    }
     Functions: {
-      get_public_salon: { Args: { p_slug: string }; Returns: Json };
+      admin_salon_overview: {
+        Args: never
+        Returns: {
+          city: string
+          created_at: string
+          kind: Database["public"]["Enums"]["salon_kind"]
+          license_quantity: number
+          licenses_in_use: number
+          name: string
+          owner_email: string
+          professionals: number
+          salon_id: string
+          slug: string
+          status: Database["public"]["Enums"]["salon_status"]
+          subscription_status: Database["public"]["Enums"]["subscription_status"]
+        }[]
+      }
+      claim_pending_notifications: {
+        Args: { p_batch_size?: number }
+        Returns: {
+          appointment_id: string | null
+          attempts: number
+          channel: Database["public"]["Enums"]["notification_channel"]
+          created_at: string
+          delivered_at: string | null
+          failed_at: string | null
+          id: string
+          idempotency_key: string
+          last_error: string | null
+          locked_at: string | null
+          max_attempts: number
+          next_attempt_at: string
+          payload: Json
+          professional_id: string | null
+          provider: string | null
+          provider_message_id: string | null
+          recipient_phone: string | null
+          recipient_user_id: string | null
+          salon_id: string
+          sent_at: string | null
+          status: Database["public"]["Enums"]["notification_status"]
+          template: string
+          updated_at: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "notifications"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      create_salon_with_owner: {
+        Args: {
+          p_license_quantity?: number
+          p_owner_email: string
+          p_owner_full_name: string
+          p_owner_works?: boolean
+          p_professional_slug?: string
+          p_salon_city?: string
+          p_salon_kind?: Database["public"]["Enums"]["salon_kind"]
+          p_salon_name: string
+          p_salon_phone?: string
+          p_salon_slug: string
+          p_trial_days?: number
+        }
+        Returns: string
+      }
+      get_my_access: { Args: never; Returns: Json }
+      get_public_salon: { Args: { p_slug: string }; Returns: Json }
       get_salon_occupancy: {
-        Args: { p_salon_id: Uuid; p_from: Timestamp; p_to: Timestamp };
-        Returns: { professional_id: Uuid; starts_at: Timestamp; ends_at: Timestamp }[];
-      };
-      claim_pending_notifications: { Args: { p_batch_size?: number }; Returns: NotificationRow[] };
-    };
+        Args: { p_from: string; p_salon_id: string; p_to: string }
+        Returns: {
+          ends_at: string
+          professional_id: string
+          starts_at: string
+        }[]
+      }
+    }
     Enums: {
-      platform_role: PlatformRole;
-      salon_kind: SalonKind;
-      salon_status: SalonStatus;
-      membership_role: MembershipRole;
-      membership_status: MembershipStatus;
-      professional_status: ProfessionalStatus;
-      schedule_exception_type: ScheduleExceptionType;
-      appointment_status: AppointmentStatus;
-      appointment_source: AppointmentSource;
-      appointment_event_type: AppointmentEventType;
-      actor_kind: ActorKind;
-      incident_status: IncidentStatus;
-      change_request_type: ChangeRequestType;
-      change_request_status: ChangeRequestStatus;
-      notification_channel: NotificationChannel;
-      notification_status: NotificationStatus;
-      subscription_status: SubscriptionStatus;
-    };
-    CompositeTypes: Record<string, never>;
-  };
-};
+      actor_kind: "professional" | "owner" | "client" | "system"
+      appointment_event_type:
+        | "created"
+        | "updated"
+        | "confirmed"
+        | "rescheduled"
+        | "cancelled"
+        | "reassigned"
+        | "completed"
+        | "no_show"
+      appointment_source: "professional" | "public_portal" | "reassignment"
+      appointment_status:
+        | "pending"
+        | "confirmed"
+        | "cancelled"
+        | "completed"
+        | "no_show"
+      change_request_status:
+        | "pending_target"
+        | "pending_client"
+        | "accepted"
+        | "rejected"
+        | "expired"
+        | "cancelled"
+        | "applied"
+      change_request_type: "reschedule" | "reassignment"
+      incident_status: "open" | "resolved" | "cancelled"
+      membership_role: "owner" | "professional"
+      membership_status: "invited" | "active" | "disabled"
+      notification_channel: "sms" | "email" | "in_app"
+      notification_status:
+        | "pending"
+        | "processing"
+        | "sent"
+        | "delivered"
+        | "failed"
+      platform_role: "user" | "admin"
+      professional_status: "invited" | "active" | "inactive"
+      salon_kind: "barberia" | "peluqueria" | "unisex"
+      salon_status: "trial" | "active" | "suspended" | "cancelled"
+      schedule_exception_type:
+        | "block"
+        | "break"
+        | "day_off"
+        | "extra_availability"
+      subscription_status:
+        | "trialing"
+        | "active"
+        | "past_due"
+        | "paused"
+        | "cancelled"
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
+}
 
-export type Tables<T extends keyof Database["public"]["Tables"]> = Database["public"]["Tables"][T]["Row"];
+type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
+
+type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
+
+export type Tables<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
+    : never) = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+      Row: infer R
+    }
+    ? R
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])
+    ? (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
+        Row: infer R
+      }
+      ? R
+      : never
+    : never
+
+export type TablesInsert<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never) = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Insert: infer I
+    }
+    ? I
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Insert: infer I
+      }
+      ? I
+      : never
+    : never
+
+export type TablesUpdate<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never) = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Update: infer U
+    }
+    ? U
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Update: infer U
+      }
+      ? U
+      : never
+    : never
+
+export type Enums<
+  DefaultSchemaEnumNameOrOptions extends
+    | keyof DefaultSchema["Enums"]
+    | { schema: keyof DatabaseWithoutInternals },
+  EnumName extends (DefaultSchemaEnumNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
+    : never) = never,
+> = DefaultSchemaEnumNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
+  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
+    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
+    : never
+
+export type CompositeTypes<
+  PublicCompositeTypeNameOrOptions extends
+    | keyof DefaultSchema["CompositeTypes"]
+    | { schema: keyof DatabaseWithoutInternals },
+  CompositeTypeName extends (PublicCompositeTypeNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    : never) = never,
+> = PublicCompositeTypeNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
+    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
+    : never
+
+export const Constants = {
+  graphql_public: {
+    Enums: {},
+  },
+  public: {
+    Enums: {
+      actor_kind: ["professional", "owner", "client", "system"],
+      appointment_event_type: [
+        "created",
+        "updated",
+        "confirmed",
+        "rescheduled",
+        "cancelled",
+        "reassigned",
+        "completed",
+        "no_show",
+      ],
+      appointment_source: ["professional", "public_portal", "reassignment"],
+      appointment_status: [
+        "pending",
+        "confirmed",
+        "cancelled",
+        "completed",
+        "no_show",
+      ],
+      change_request_status: [
+        "pending_target",
+        "pending_client",
+        "accepted",
+        "rejected",
+        "expired",
+        "cancelled",
+        "applied",
+      ],
+      change_request_type: ["reschedule", "reassignment"],
+      incident_status: ["open", "resolved", "cancelled"],
+      membership_role: ["owner", "professional"],
+      membership_status: ["invited", "active", "disabled"],
+      notification_channel: ["sms", "email", "in_app"],
+      notification_status: [
+        "pending",
+        "processing",
+        "sent",
+        "delivered",
+        "failed",
+      ],
+      platform_role: ["user", "admin"],
+      professional_status: ["invited", "active", "inactive"],
+      salon_kind: ["barberia", "peluqueria", "unisex"],
+      salon_status: ["trial", "active", "suspended", "cancelled"],
+      schedule_exception_type: [
+        "block",
+        "break",
+        "day_off",
+        "extra_availability",
+      ],
+      subscription_status: [
+        "trialing",
+        "active",
+        "past_due",
+        "paused",
+        "cancelled",
+      ],
+    },
+  },
+} as const

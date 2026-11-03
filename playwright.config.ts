@@ -23,5 +23,8 @@ export default defineConfig({
     url: `http://localhost:${PORT}`,
     reuseExistingServer: !process.env.CI,
     timeout: 180_000,
+    // Las E2E se ejecutan en modo demostración: nunca contra la base de datos real.
+    // Las variables vacías tienen prioridad sobre .env.local.
+    env: { NEXT_PUBLIC_SUPABASE_URL: "", NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: "", SUPABASE_SECRET_KEY: "" },
   },
 });

@@ -33,7 +33,7 @@ cp .env.example .env.local
 npm run db:start       # levanta Supabase en Docker e imprime URL y claves
 # copia "API URL" y "Publishable key" en .env.local
 npm run db:reset       # aplica migraciones + supabase/seed.sql
-npm run db:types       # regenera src/types/database.types.ts
+npm run db:types       # regenera los tipos desde el proyecto vinculado
 npm run dev
 ```
 
@@ -60,9 +60,12 @@ La primera vez que se ejecute Playwright: `npx playwright install chromium`.
 ```
 src/
   app/
-    (auth)/login/            Acceso (Server Action + Zod)
-    (panel)/profesional/     Panel del profesional (dashboard + secciones por sprint)
-    auth/callback|signout/   Route Handlers de Supabase Auth
+    (auth)/                  Login, recuperación, nueva contraseña, sin acceso
+    (panel)/profesional/     Panel del profesional
+    (panel)/propietario/     Panel del propietario
+    (panel)/admin/           Administración de la plataforma
+    panel/                   Redirección por rol tras el login
+    auth/confirm|callback|signout/  Route Handlers de Supabase Auth
     page.tsx                 Portada de marca
   components/
     ui/                      shadcn/ui (personalizado con tokens VELTUX)
@@ -78,7 +81,8 @@ src/
     supabase/                Clientes browser/server/admin + refresco de sesión
     permissions/             Rutas protegidas, redirecciones seguras
     datetime.ts format.ts    Zonas horarias (Intl) y formato es-ES
-  types/database.types.ts    Tipos de la BD (provisional → `npm run db:types`)
+  types/database.types.ts    Tipos generados desde PostgreSQL (`npm run db:types`)
+  types/database.ts          Alias legibles sobre los tipos generados
   proxy.ts                   Proxy de Next 16 (antes middleware)
 supabase/
   migrations/                Esquema + RLS
@@ -130,18 +134,32 @@ tests/
 
 **Limitaciones conocidas**
 
-- `src/types/database.types.ts` está escrito a mano; se sustituirá con `npm run db:types` cuando haya Supabase local.
-- Las pruebas SQL usan PGlite con un *stub* de `auth`; en el Sprint 1 se añadirán pruebas pgTAP con `supabase test db` contra el stack real.
+- Las pruebas SQL usan PGlite con un *stub* de `auth`; las pruebas pgTAP con `supabase test db` requieren Docker.
 - La referencia UX/UI (imagen 2) no se recibió; el dashboard sigue la identidad corporativa (imagen 1) y las pautas escritas.
 - El solapamiento cita/bloqueo (`schedule_exceptions`) se validará en la función transaccional de reserva (Sprint 4).
 
-## Sprint 1 · Autenticación, peluquerías y roles (propuesta)
+## Sprint 1 · Entregado
 
-1. **Registro de propietario + alta de peluquería** en una única función transaccional `create_salon_with_owner()` (salón, membresía owner, suscripción piloto, slug validado).
-2. **Recuperación de contraseña** y confirmación de email (plantillas en español en `supabase/templates`).
-3. **Selector de rol / establecimiento** tras el login (propietario ↔ profesional) y redirección por rol.
-4. **Layouts de propietario (`/propietario`) y administración (`/admin`)** con su navegación y guardas de servidor.
-5. **Mi perfil y Configuración** del profesional (actualización por columnas permitidas).
-6. **Invitaciones**: tabla `invitations` (token con hash, caducidad) y aceptación que vincula `user_id`.
-7. **Pruebas**: pgTAP con `supabase test db`, E2E de login/logout con usuarios del seed, CI en GitHub Actions (lint, typecheck, Vitest, Playwright).
-8. **Tipos generados** y eliminación del archivo provisional.
+Detalle completo (historias, criterios de aceptación y configuración de Supabase): [docs/sprints/sprint-1.md](docs/sprints/sprint-1.md).
+
+- [x] Alta cerrada de establecimientos desde `/admin` (invitación + `create_salon_with_owner()` transaccional)
+- [x] Invitación, recuperación y cambio de contraseña (`/auth/confirm` con `token_hash`, plantillas en español)
+- [x] Entrada por rol (`/panel`) y cambio de área para usuarios con varios roles
+- [x] Paneles de propietario (dashboard + configuración) y administración (dashboard + establecimientos)
+- [x] Mi perfil y Configuración del profesional
+- [x] Autorización por página y en la capa de datos (`requireArea`), además de RLS
+- [x] CI en GitHub Actions; pruebas: 79 Vitest y 13 Playwright
+- [x] CLI de Supabase vinculada; migraciones aplicadas con `db push` y tipos generados del proyecto real
+
+**Aprendido en el sprint**
+
+- En App Router el layout y la página se renderizan en paralelo: una guarda en el layout no impide que el código de la página se ejecute. Cada página y función de datos comprueba el acceso.
+- En Zod 4, `z.email().trim()` valida antes de recortar; los emails se normalizan con `emailSchema()` (recorta y pasa a minúsculas antes de validar).
+
+## Sprint 2 · Profesionales y licencias (propuesta)
+
+1. **Invitación de profesionales por el propietario**: email + ficha en estado `invited`; al aceptar, se vincula el `user_id` y se activa.
+2. **Gestión de licencias** (`/propietario/licencias`): asignar, liberar con motivo, cupo contratado e historial desde `license_assignments` y `audit_logs`.
+3. **Gestión de profesionales** (`/propietario/profesionales`): alta, estado activo/inactivo y orden; sin acceso a sus clientes ni citas.
+4. **Ajuste manual de licencias contratadas** por el administrador durante el piloto (`/admin/licencias`).
+5. **Pruebas**: RLS de invitaciones, límite de licencias concurrente y E2E del flujo de invitación.

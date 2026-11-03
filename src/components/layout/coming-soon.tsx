@@ -21,8 +21,8 @@ export function ComingSoon({ href }: { href: string }) {
         </span>
         <p className="mt-4 max-w-md text-sm text-muted-foreground">{item.description}</p>
         <Button asChild variant="outline" size="lg" className="mt-6">
-          <Link href="/profesional">
-            <ArrowLeft /> Volver al dashboard
+          <Link href={`/${href.split("/")[1]}`}>
+            <ArrowLeft /> Volver al inicio
           </Link>
         </Button>
       </div>
