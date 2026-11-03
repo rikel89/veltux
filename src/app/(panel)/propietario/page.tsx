@@ -73,7 +73,10 @@ export default async function OwnerDashboardPage() {
           </header>
           {professionals.length === 0 ? (
             <p className="px-6 py-10 text-center text-sm text-muted-foreground">
-              Aún no hay profesionales. Las invitaciones llegan en el Sprint 2.
+              Aún no hay profesionales.{" "}
+              <Link href="/propietario/profesionales" className="font-semibold text-lime-ink hover:underline">
+                Invita al primero
+              </Link>
             </p>
           ) : (
             <ul className="divide-y divide-border">

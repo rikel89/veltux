@@ -18,7 +18,7 @@ import {
 import type { Area } from "@/modules/auth/access-rules";
 
 /** Sprint en curso: las secciones de sprints posteriores muestran su etiqueta. */
-export const CURRENT_SPRINT = 1;
+export const CURRENT_SPRINT = 2;
 
 export type NavItem = {
   label: string;

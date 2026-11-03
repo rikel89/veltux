@@ -1,5 +1,6 @@
 "use server";
 
+import { refresh } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { fieldErrors, type FormState } from "@/lib/validations/common";
 import { getAccess, requireArea } from "@/modules/auth/access";
@@ -35,5 +36,6 @@ export async function updateMyProfessionalProfile(_prev: FormState, formData: Fo
   if (error) return { error: "No se pudieron guardar los cambios." };
   if (!data?.length) return { error: "No tienes permisos para modificar esta ficha." };
 
+  refresh(); // actualiza el nombre en el sidebar
   return { ok: true, message: "Perfil actualizado." };
 }

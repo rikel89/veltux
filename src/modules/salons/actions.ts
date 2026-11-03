@@ -1,5 +1,6 @@
 "use server";
 
+import { refresh } from "next/cache";
 import { redirect } from "next/navigation";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
@@ -100,5 +101,6 @@ export async function updateSalonSettings(_prev: FormState, formData: FormData):
   if (error) return { error: "No se pudieron guardar los cambios." };
   if (!data?.length) return { error: "No tienes permisos para modificar este establecimiento." };
 
+  refresh(); // actualiza el nombre en el sidebar
   return { ok: true, message: "Datos del establecimiento guardados." };
 }

@@ -1065,6 +1065,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      accept_my_invitations: { Args: never; Returns: number }
       admin_salon_overview: {
         Args: never
         Returns: {
@@ -1081,6 +1082,10 @@ export type Database = {
           status: Database["public"]["Enums"]["salon_status"]
           subscription_status: Database["public"]["Enums"]["subscription_status"]
         }[]
+      }
+      admin_set_license_quantity: {
+        Args: { p_quantity: number; p_salon_id: string }
+        Returns: undefined
       }
       claim_pending_notifications: {
         Args: { p_batch_size?: number }
@@ -1141,6 +1146,24 @@ export type Database = {
           professional_id: string
           starts_at: string
         }[]
+      }
+      invite_professional: {
+        Args: {
+          p_assign_license?: boolean
+          p_display_name: string
+          p_email: string
+          p_salon_id: string
+          p_slug: string
+        }
+        Returns: string
+      }
+      set_professional_active: {
+        Args: {
+          p_active: boolean
+          p_professional_id: string
+          p_reason?: string
+        }
+        Returns: undefined
       }
     }
     Enums: {

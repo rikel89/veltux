@@ -156,10 +156,21 @@ Detalle completo (historias, criterios de aceptación y configuración de Supaba
 - En App Router el layout y la página se renderizan en paralelo: una guarda en el layout no impide que el código de la página se ejecute. Cada página y función de datos comprueba el acceso.
 - En Zod 4, `z.email().trim()` valida antes de recortar; los emails se normalizan con `emailSchema()` (recorta y pasa a minúsculas antes de validar).
 
-## Sprint 2 · Profesionales y licencias (propuesta)
+## Sprint 2 · Entregado
 
-1. **Invitación de profesionales por el propietario**: email + ficha en estado `invited`; al aceptar, se vincula el `user_id` y se activa.
-2. **Gestión de licencias** (`/propietario/licencias`): asignar, liberar con motivo, cupo contratado e historial desde `license_assignments` y `audit_logs`.
-3. **Gestión de profesionales** (`/propietario/profesionales`): alta, estado activo/inactivo y orden; sin acceso a sus clientes ni citas.
-4. **Ajuste manual de licencias contratadas** por el administrador durante el piloto (`/admin/licencias`).
-5. **Pruebas**: RLS de invitaciones, límite de licencias concurrente y E2E del flujo de invitación.
+Detalle: [docs/sprints/sprint-2.md](docs/sprints/sprint-2.md).
+
+- [x] Invitación de profesionales por el propietario (email + ficha, membresía y licencia en una transacción)
+- [x] Aceptación automática al entrar (`accept_my_invitations()` en `/panel`)
+- [x] Gestión de licencias: asignar, liberar con motivo, cupo e historial
+- [x] Activar / desactivar profesionales (desactivar libera la licencia; conservan la lectura de sus datos)
+- [x] Ajuste manual del cupo por el administrador
+- [x] Pruebas: 91 Vitest (12 nuevas del flujo de equipo) y 13 Playwright
+
+## Sprint 3 · Servicios, tarifas y horarios (propuesta)
+
+1. **Mis servicios**: crear, editar, ordenar y desactivar servicios con duración, margen y precio individuales.
+2. **Mis horarios**: horario semanal con jornada partida y validación de franjas sin solapes (restricción en PostgreSQL).
+3. **Excepciones**: días libres, vacaciones y disponibilidad extra (`schedule_exceptions`).
+4. **Cálculo de disponibilidad** en PostgreSQL (`get_available_slots`), base del motor de reservas de los sprints 4 y 5.
+5. **Pruebas**: RLS de servicios/horarios, cálculo de huecos con cambios de hora y jornada partida.
