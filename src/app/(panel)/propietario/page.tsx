@@ -123,7 +123,7 @@ export default async function OwnerDashboardPage() {
           <h2 id="enlace" className="text-sm font-semibold text-neutral-300">
             Página de reservas del establecimiento
           </h2>
-          <CopyBookingLink path={`veltux.es/${salon.slug}`} />
+          <CopyBookingLink path={`/${salon.slug}`} />
           <p className="mt-3 text-xs text-neutral-500">
             Tus clientes eligen profesional, servicio y hora, y confirman la reserva con un código por SMS.
           </p>

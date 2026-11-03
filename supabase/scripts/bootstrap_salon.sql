@@ -18,12 +18,12 @@ declare
   v_owner_email       text    := 'tu-email@ejemplo.com';
   v_owner_full_name   text    := 'Nombre Apellido';
   v_salon_name        text    := 'Barbería Elegance';
-  v_salon_slug        text    := 'barberia-elegance';   -- URL pública: veltux.es/<slug>
+  v_salon_slug        text    := 'barberia-elegance';   -- URL pública: <dominio>/<slug>
   v_salon_kind        public.salon_kind := 'barberia';  -- barberia | peluqueria | unisex
   v_salon_city        text    := 'Madrid';
   v_salon_phone       text    := null;                  -- formato +34XXXXXXXXX o null
   v_license_quantity  integer := 3;                     -- licencias contratadas en el piloto
-  v_professional_slug text    := 'carlos';              -- veltux.es/<salon>/<profesional>
+  v_professional_slug text    := 'carlos';              -- <dominio>/<salon>/<profesional>
   v_owner_works       boolean := true;                  -- el propietario también atiende con agenda
   v_starter_config    boolean := true;                  -- servicios y horario iniciales
   -- --------------------------------------------------------------------------
@@ -65,6 +65,6 @@ begin
     select v_salon_id, v_professional_id, 6, time '09:00', time '14:00';
   end if;
 
-  raise notice 'Establecimiento creado: % (veltux.es/%) · salon_id=%', v_salon_name, lower(v_salon_slug), v_salon_id;
+  raise notice 'Establecimiento creado: % (/%) · salon_id=%', v_salon_name, lower(v_salon_slug), v_salon_id;
 end;
 $$;

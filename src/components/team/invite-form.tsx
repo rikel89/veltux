@@ -5,6 +5,7 @@ import { FormField } from "@/components/forms/form-field";
 import { FormMessage, SubmitButton } from "@/components/forms/form-status";
 import { slugify, type FormState } from "@/lib/validations/common";
 import { inviteProfessional } from "@/modules/licensing/actions";
+import { publicLabel } from "@/lib/site";
 
 export function InviteForm({ salonSlug, freeLicenses }: { salonSlug: string; freeLicenses: number }) {
   const [state, action] = useActionState<FormState, FormData>(inviteProfessional, {});
@@ -54,7 +55,7 @@ function InviteFields({
           setSlugTouched(true);
           setSlug(ev.target.value.toLowerCase());
         }}
-        hint={`veltux.es/${salonSlug}/${slug || "nombre"}`}
+        hint={publicLabel(`/${salonSlug}/${slug || "nombre"}`)}
         error={e.slug}
       />
       <label className="flex items-start gap-3 rounded-xl border border-border bg-surface p-4">

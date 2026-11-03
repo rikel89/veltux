@@ -1,6 +1,7 @@
 import { Building2 } from "lucide-react";
 import type { SalonOverviewRow } from "@/modules/salons/queries";
 import { LicenseUsage, SalonStatusBadge } from "./salon-status";
+import { publicLabel } from "@/lib/site";
 
 const KIND: Record<string, string> = { barberia: "Barbería", peluqueria: "Peluquería", unisex: "Unisex" };
 const date = new Intl.DateTimeFormat("es-ES", { day: "numeric", month: "short", year: "numeric" });
@@ -30,7 +31,7 @@ export function SalonTable({ rows, highlightSlug }: { rows: SalonOverviewRow[]; 
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
                 <p className="truncate font-semibold">{r.name}</p>
-                <p className="truncate text-xs text-muted-foreground">veltux.es/{r.slug}</p>
+                <p className="truncate text-xs text-muted-foreground">{publicLabel(`/${r.slug}`)}</p>
               </div>
               <SalonStatusBadge status={r.status} />
             </div>
@@ -61,7 +62,7 @@ export function SalonTable({ rows, highlightSlug }: { rows: SalonOverviewRow[]; 
                 <td className="px-5 py-3.5">
                   <p className="font-semibold">{r.name}</p>
                   <p className="text-xs text-muted-foreground">
-                    veltux.es/{r.slug}
+                    {publicLabel(`/${r.slug}`)}
                     {r.city ? ` · ${r.city}` : ""}
                   </p>
                 </td>

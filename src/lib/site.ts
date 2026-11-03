@@ -5,3 +5,13 @@ export function getSiteUrl(): string {
   if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
   return "http://localhost:3000";
 }
+
+/** Dirección pública completa de una ruta ("/mi-salon" → "https://…/mi-salon"). */
+export function publicUrl(path: string): string {
+  return `${getSiteUrl()}${path}`;
+}
+
+/** La misma dirección para mostrarla, sin el protocolo. */
+export function publicLabel(path: string): string {
+  return publicUrl(path).replace(/^https?:\/\//, "");
+}

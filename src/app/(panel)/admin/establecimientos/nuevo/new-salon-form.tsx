@@ -6,6 +6,7 @@ import { FormMessage, SubmitButton } from "@/components/forms/form-status";
 import { slugify, type FormState } from "@/lib/validations/common";
 import { createSalon } from "@/modules/salons/actions";
 import { SALON_KINDS } from "@/modules/salons/schemas";
+import { publicLabel } from "@/lib/site";
 
 function Section({ title, description, children }: { title: string; description: string; children: React.ReactNode }) {
   return (
@@ -59,7 +60,7 @@ export function NewSalonForm() {
             setSalonSlugTouched(true);
             setSalonSlug(ev.target.value.toLowerCase());
           }}
-          hint={`veltux.es/${salonSlug || "tu-peluqueria"}`}
+          hint={publicLabel(`/${salonSlug || "tu-peluqueria"}`)}
           error={e.salonSlug}
         />
         <FormSelect name="salonKind" label="Tipo" options={SALON_KINDS} defaultValue="barberia" error={e.salonKind} />
@@ -112,7 +113,7 @@ export function NewSalonForm() {
               setProSlugTouched(true);
               setProSlug(ev.target.value.toLowerCase());
             }}
-            hint={`veltux.es/${salonSlug || "tu-peluqueria"}/${proSlug || "nombre"}`}
+            hint={publicLabel(`/${salonSlug || "tu-peluqueria"}/${proSlug || "nombre"}`)}
             error={e.professionalSlug}
           />
         )}

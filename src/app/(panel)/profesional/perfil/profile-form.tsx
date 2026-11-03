@@ -21,7 +21,7 @@ export function ProfileForm({ profile }: { profile: ProfessionalProfile }) {
     <form action={action} className="space-y-5" noValidate>
       <section className="rounded-2xl bg-graphite p-5 text-white sm:p-6">
         <p className="text-xs font-semibold text-neutral-400">Tu enlace personal de reservas</p>
-        <CopyBookingLink path={`veltux.es/${profile.salonSlug}/${profile.slug}`} />
+        <CopyBookingLink path={`/${profile.salonSlug}/${profile.slug}`} />
         <a
           href={`/${profile.salonSlug}/${profile.slug}`}
           target="_blank"

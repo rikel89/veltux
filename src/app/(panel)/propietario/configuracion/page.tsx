@@ -4,6 +4,7 @@ import { PageHeader } from "@/components/layout/page-header";
 import { ownerSalon, requireArea } from "@/modules/auth/access";
 import { getOwnerSalonSummary } from "@/modules/salons/queries";
 import { SalonSettingsForm } from "./salon-settings-form";
+import { publicLabel } from "@/lib/site";
 
 export const metadata: Metadata = { title: "Configuración del establecimiento" };
 
@@ -18,7 +19,7 @@ export default async function OwnerSettingsPage() {
     <div className="mx-auto flex max-w-3xl flex-col gap-6">
       <PageHeader
         title="Configuración"
-        description={`Datos de ${s.name}. La dirección de reservas (veltux.es/${s.slug}) la gestiona VELTUX.`}
+        description={`Datos de ${s.name}. La dirección de reservas (${publicLabel(`/${s.slug}`)}) la gestiona VELTUX.`}
       />
       <SalonSettingsForm
         defaults={{

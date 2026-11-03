@@ -35,7 +35,7 @@ export function QuickActions({ salonSlug }: { salonSlug: string }) {
         <p className="flex items-center gap-2 text-xs font-semibold text-neutral-400">
           <Link2 className="size-3.5 text-lime" /> Tu enlace de reservas
         </p>
-        <CopyBookingLink path={`veltux.es/${salonSlug}`} />
+        <CopyBookingLink path={`/${salonSlug}`} />
         <p className="mt-2 text-[11px] text-neutral-500">Tus clientes confirman la reserva con un código por SMS.</p>
       </div>
     </section>

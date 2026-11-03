@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { initials } from "@/lib/format";
 import { ownerSalon, requireArea } from "@/modules/auth/access";
 import { getSalonTeam } from "@/modules/licensing/queries";
+import { publicLabel } from "@/lib/site";
 
 export const metadata: Metadata = { title: "Profesionales" };
 
@@ -57,7 +58,7 @@ export default async function OwnerProfessionalsPage() {
                       {m.isSelf && <span className="ml-1.5 text-xs font-medium text-muted-foreground">(tú)</span>}
                     </p>
                     <p className="truncate text-xs text-muted-foreground">
-                      {m.email ?? "—"} · veltux.es/{team.salonSlug}/{m.slug}
+                      {m.email ?? "—"} · {publicLabel(`/${team.salonSlug}/${m.slug}`)}
                     </p>
                     <div className="mt-2 flex flex-wrap gap-1.5">
                       <ProfessionalStatusBadge status={m.status} />

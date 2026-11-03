@@ -2,13 +2,14 @@
 
 import { useState } from "react";
 import { Check, Copy } from "lucide-react";
+import { publicLabel, publicUrl } from "@/lib/site";
 
 export function CopyBookingLink({ path }: { path: string }) {
   const [copied, setCopied] = useState(false);
 
   async function copy() {
     try {
-      await navigator.clipboard.writeText(`https://${path}`);
+      await navigator.clipboard.writeText(publicUrl(path));
       setCopied(true);
       setTimeout(() => setCopied(false), 1800);
     } catch {
@@ -18,7 +19,7 @@ export function CopyBookingLink({ path }: { path: string }) {
 
   return (
     <div className="mt-2 flex items-center gap-2">
-      <code className="min-w-0 flex-1 truncate text-sm font-semibold text-white">{path}</code>
+      <code className="min-w-0 flex-1 truncate text-sm font-semibold text-white">{publicLabel(path)}</code>
       <button
         type="button"
         onClick={copy}
