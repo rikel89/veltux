@@ -353,6 +353,50 @@ export type Database = {
           },
         ]
       }
+      booking_otps: {
+        Row: {
+          attempts: number
+          code_hash: string
+          consumed_at: string | null
+          created_at: string
+          expires_at: string
+          id: string
+          ip_hash: string | null
+          phone: string
+          professional_id: string
+        }
+        Insert: {
+          attempts?: number
+          code_hash: string
+          consumed_at?: string | null
+          created_at?: string
+          expires_at?: string
+          id?: string
+          ip_hash?: string | null
+          phone: string
+          professional_id: string
+        }
+        Update: {
+          attempts?: number
+          code_hash?: string
+          consumed_at?: string | null
+          created_at?: string
+          expires_at?: string
+          id?: string
+          ip_hash?: string | null
+          phone?: string
+          professional_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "booking_otps_professional_id_fkey"
+            columns: ["professional_id"]
+            isOneToOne: false
+            referencedRelation: "professionals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       clients: {
         Row: {
           archived_at: string | null
@@ -576,11 +620,13 @@ export type Database = {
           accepts_online_booking: boolean
           avatar_url: string | null
           bio: string | null
+          booking_horizon_days: number
           color: string
           created_at: string
           display_name: string
           email: string | null
           id: string
+          min_notice_minutes: number
           phone: string | null
           salon_id: string
           slug: string
@@ -593,11 +639,13 @@ export type Database = {
           accepts_online_booking?: boolean
           avatar_url?: string | null
           bio?: string | null
+          booking_horizon_days?: number
           color?: string
           created_at?: string
           display_name: string
           email?: string | null
           id?: string
+          min_notice_minutes?: number
           phone?: string | null
           salon_id: string
           slug: string
@@ -610,11 +658,13 @@ export type Database = {
           accepts_online_booking?: boolean
           avatar_url?: string | null
           bio?: string | null
+          booking_horizon_days?: number
           color?: string
           created_at?: string
           display_name?: string
           email?: string | null
           id?: string
+          min_notice_minutes?: number
           phone?: string | null
           salon_id?: string
           slug?: string
@@ -1131,6 +1181,18 @@ export type Database = {
         }
         Returns: string
       }
+      create_public_booking: {
+        Args: {
+          p_code: string
+          p_email?: string
+          p_full_name: string
+          p_notes?: string
+          p_otp_id: string
+          p_service_id: string
+          p_starts_at: string
+        }
+        Returns: string
+      }
       create_salon_with_owner: {
         Args: {
           p_license_quantity?: number
@@ -1182,6 +1244,14 @@ export type Database = {
       replace_my_weekly_schedule: {
         Args: { p_professional_id: string; p_slots: Json }
         Returns: number
+      }
+      request_booking_otp: {
+        Args: { p_ip_hash?: string; p_phone: string; p_professional_id: string }
+        Returns: {
+          code: string
+          expires_at: string
+          otp_id: string
+        }[]
       }
       reschedule_my_appointment: {
         Args: {

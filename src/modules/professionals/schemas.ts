@@ -13,6 +13,11 @@ export const PROFESSIONAL_COLORS = [
   { value: "#94A3B8", label: "Pizarra" },
 ] as const;
 
+/** Antelación mínima para reservar online (minutos). */
+export const NOTICE_OPTIONS = [0, 30, 60, 120, 240, 720, 1440, 2880] as const;
+/** Hasta cuántos días vista se puede reservar online. */
+export const HORIZON_OPTIONS = [7, 14, 30, 60, 90, 180] as const;
+
 const colorValues = PROFESSIONAL_COLORS.map((c) => c.value) as [string, ...string[]];
 
 export const professionalProfileSchema = z.object({
@@ -21,6 +26,8 @@ export const professionalProfileSchema = z.object({
   phone: optional(phoneSchema),
   color: z.enum(colorValues),
   acceptsOnlineBooking: checkbox,
+  minNoticeMinutes: z.coerce.number().int().refine((v) => (NOTICE_OPTIONS as readonly number[]).includes(v), "Opción no válida"),
+  bookingHorizonDays: z.coerce.number().int().refine((v) => (HORIZON_OPTIONS as readonly number[]).includes(v), "Opción no válida"),
 });
 
 export type ProfessionalProfileInput = z.infer<typeof professionalProfileSchema>;

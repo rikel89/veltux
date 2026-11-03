@@ -73,6 +73,9 @@ export async function seedScenario(db: Db) {
       ('${p.proA2}', '${salons.a}', '${users.userA2}', 'Javier', 'javier', '+34600000002', 'active'),
       ('${p.proB1}', '${salons.b}', '${users.userB1}', 'Lucía',  'lucia',  '+34600000003', 'active');
 
+    -- Las pruebas usan fechas de 2027: horizonte de reserva de un año.
+    update public.professionals set booking_horizon_days = 365;
+
     insert into public.license_assignments (salon_id, professional_id, assigned_by) values
       ('${salons.a}', '${p.proA1}', '${users.ownerA}'),
       ('${salons.a}', '${p.proA2}', '${users.ownerA}'),

@@ -59,6 +59,8 @@ export type ProfessionalProfile = {
   phone: string | null;
   color: string;
   acceptsOnlineBooking: boolean;
+  minNoticeMinutes: number;
+  bookingHorizonDays: number;
   salonSlug: string;
 };
 
@@ -66,7 +68,7 @@ export type ProfessionalProfile = {
 export async function getMyProfessionalProfile(supabase: Client, userId: string): Promise<ProfessionalProfile | null> {
   const { data, error } = await supabase
     .from("professionals")
-    .select("id, display_name, slug, bio, phone, color, accepts_online_booking, salon_id")
+    .select("id, display_name, slug, bio, phone, color, accepts_online_booking, min_notice_minutes, booking_horizon_days, salon_id")
     .eq("user_id", userId)
     .order("created_at")
     .limit(1)
@@ -85,6 +87,8 @@ export async function getMyProfessionalProfile(supabase: Client, userId: string)
     phone: data.phone,
     color: data.color,
     acceptsOnlineBooking: data.accepts_online_booking,
+    minNoticeMinutes: data.min_notice_minutes,
+    bookingHorizonDays: data.booking_horizon_days,
     salonSlug: salon.slug,
   };
 }

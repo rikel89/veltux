@@ -110,7 +110,7 @@ export default async function OwnerDashboardPage() {
           </h2>
           <CopyBookingLink path={`veltux.es/${salon.slug}`} />
           <p className="mt-3 text-xs text-neutral-500">
-            Tus clientes elegirán profesional, servicio y hora. Se activa en el Sprint 5.
+            Tus clientes eligen profesional, servicio y hora, y confirman la reserva con un código por SMS.
           </p>
         </section>
       </div>

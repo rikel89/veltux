@@ -2,14 +2,15 @@
 
 import { useActionState, useState } from "react";
 import { Check } from "lucide-react";
-import { FormField, FormTextarea } from "@/components/forms/form-field";
+import { FormField, FormSelect, FormTextarea } from "@/components/forms/form-field";
 import { FormMessage, SubmitButton } from "@/components/forms/form-status";
 import { CopyBookingLink } from "@/components/dashboard/copy-booking-link";
 import { cn } from "@/lib/utils";
 import type { FormState } from "@/lib/validations/common";
 import { updateMyProfessionalProfile } from "@/modules/professionals/actions";
 import type { ProfessionalProfile } from "@/modules/professionals/queries";
-import { PROFESSIONAL_COLORS } from "@/modules/professionals/schemas";
+import { HORIZON_OPTIONS, NOTICE_OPTIONS, PROFESSIONAL_COLORS } from "@/modules/professionals/schemas";
+import { describeNotice } from "@/modules/booking/flow";
 
 export function ProfileForm({ profile }: { profile: ProfessionalProfile }) {
   const [state, action] = useActionState<FormState, FormData>(updateMyProfessionalProfile, {});
@@ -21,7 +22,14 @@ export function ProfileForm({ profile }: { profile: ProfessionalProfile }) {
       <section className="rounded-2xl bg-graphite p-5 text-white sm:p-6">
         <p className="text-xs font-semibold text-neutral-400">Tu enlace personal de reservas</p>
         <CopyBookingLink path={`veltux.es/${profile.salonSlug}/${profile.slug}`} />
-        <p className="mt-2 text-[11px] text-neutral-500">El portal público de reservas se activa en el Sprint 5.</p>
+        <a
+          href={`/${profile.salonSlug}/${profile.slug}`}
+          target="_blank"
+          rel="noreferrer"
+          className="mt-2 inline-block text-[11px] font-semibold text-lime underline-offset-4 hover:underline"
+        >
+          Ver mi página de reservas
+        </a>
       </section>
 
       <section className="rounded-2xl border border-border bg-card p-5 shadow-card sm:p-6">
@@ -97,6 +105,23 @@ export function ProfileForm({ profile }: { profile: ProfessionalProfile }) {
               </span>
             </span>
           </label>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <FormSelect
+              name="minNoticeMinutes"
+              label="Antelación mínima"
+              defaultValue={String(profile.minNoticeMinutes)}
+              options={NOTICE_OPTIONS.map((m) => ({ value: String(m), label: m === 0 ? "Sin antelación" : describeNotice(m) }))}
+              error={e.minNoticeMinutes}
+            />
+            <FormSelect
+              name="bookingHorizonDays"
+              label="Reservas hasta"
+              defaultValue={String(profile.bookingHorizonDays)}
+              options={HORIZON_OPTIONS.map((d) => ({ value: String(d), label: `${d} días vista` }))}
+              error={e.bookingHorizonDays}
+            />
+          </div>
         </div>
       </section>
 

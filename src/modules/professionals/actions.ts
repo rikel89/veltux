@@ -29,6 +29,8 @@ export async function updateMyProfessionalProfile(_prev: FormState, formData: Fo
       phone: v.phone,
       color: v.color,
       accepts_online_booking: v.acceptsOnlineBooking,
+      min_notice_minutes: v.minNoticeMinutes,
+      booking_horizon_days: v.bookingHorizonDays,
     })
     .eq("id", ctx.professionalId)
     .eq("user_id", access.userId)

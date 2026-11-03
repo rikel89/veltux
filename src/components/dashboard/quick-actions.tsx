@@ -36,7 +36,7 @@ export function QuickActions({ salonSlug }: { salonSlug: string }) {
           <Link2 className="size-3.5 text-lime" /> Tu enlace de reservas
         </p>
         <CopyBookingLink path={`veltux.es/${salonSlug}`} />
-        <p className="mt-2 text-[11px] text-neutral-500">El portal público de reservas se activa en el Sprint 5.</p>
+        <p className="mt-2 text-[11px] text-neutral-500">Tus clientes confirman la reserva con un código por SMS.</p>
       </div>
     </section>
   );

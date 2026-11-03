@@ -186,10 +186,24 @@ Detalle: [docs/sprints/sprint-4.md](docs/sprints/sprint-4.md).
 - [x] **Mis clientes**: cartera privada con búsqueda, alta rápida desde la cita, ficha con notas e historial, archivado
 - [x] Pruebas: 144 Vitest (16 SQL de agenda, 9 unitarias) y 23 Playwright
 
-## Sprint 5 · Reserva pública + OTP (propuesta)
+## Sprint 5 · Entregado
 
-1. **Página pública** `veltux.es/{salón}/{profesional}`: servicios públicos y huecos de `get_available_slots`.
-2. **Verificación del teléfono por SMS (OTP)** antes de reservar; límite de intentos y caducidad.
-3. **Reserva pública** transaccional (`source = public_portal`) que crea o reutiliza el cliente en la cartera del profesional.
-4. **Antelación mínima y horizonte** configurables por profesional.
-5. **Pruebas**: abuso (límite de OTP), carrera por el mismo hueco, datos que nunca se exponen al público.
+Detalle: [docs/sprints/sprint-5.md](docs/sprints/sprint-5.md).
+
+- [x] **Páginas públicas** `/{salón}` y `/{salón}/{profesional}`: servicios públicos, días y horas libres, móvil primero
+- [x] **Verificación por SMS (OTP)**: código de 6 cifras guardado solo como hash, caduca en 10 min, 5 intentos, límites por teléfono e IP en PostgreSQL
+- [x] **Reserva pública transaccional** (`create_public_booking`): verifica el código, crea o reutiliza el cliente en la cartera del profesional y crea la cita
+- [x] **Antelación mínima y horizonte** de reserva configurables en *Mi perfil*
+- [x] API pública con Route Handlers (`/api/public/slots`, `/otp`, `/bookings`) con comprobación de origen
+- [x] SMS: interfaz lista; en desarrollo el código se escribe en la consola del servidor y en producción, sin proveedor, la reserva online se desactiva
+- [x] Pruebas: 167 Vitest (12 SQL del flujo público, 11 unitarias) y 29 Playwright
+
+**Pendiente de decisión:** proveedor de SMS (Twilio, Vonage, MessageBird…) y sus credenciales.
+
+## Sprint 6 · Imprevistos y notificaciones (propuesta)
+
+1. **Proveedor de SMS real** detrás de la interfaz `src/lib/sms` y cola `notifications` (`claim_pending_notifications`).
+2. **Confirmación y recordatorio** de cita por SMS (24 h antes) y aviso al cancelar o mover.
+3. **Gestionar imprevisto**: bloquear un tramo y resolver las citas afectadas (cancelar avisando, mover o pedir reasignación a otro profesional).
+4. **Enlace de gestión para el cliente**: cancelar su cita desde el SMS sin cuenta.
+5. **Pruebas**: cola con reintentos, idempotencia, flujo de imprevisto.
