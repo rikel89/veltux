@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { optional, phoneSchema } from "@/lib/validations/common";
+import { checkbox, optional, phoneSchema } from "@/lib/validations/common";
 
 /** Colores de agenda disponibles (identifican al profesional en vistas compartidas). */
 export const PROFESSIONAL_COLORS = [
@@ -20,7 +20,7 @@ export const professionalProfileSchema = z.object({
   bio: optional(z.string().trim().max(500, "Máximo 500 caracteres")),
   phone: optional(phoneSchema),
   color: z.enum(colorValues),
-  acceptsOnlineBooking: z.preprocess((v) => v === "on" || v === "true", z.boolean()),
+  acceptsOnlineBooking: checkbox,
 });
 
 export type ProfessionalProfileInput = z.infer<typeof professionalProfileSchema>;

@@ -167,10 +167,20 @@ Detalle: [docs/sprints/sprint-2.md](docs/sprints/sprint-2.md).
 - [x] Ajuste manual del cupo por el administrador
 - [x] Pruebas: 91 Vitest (12 nuevas del flujo de equipo) y 13 Playwright
 
-## Sprint 3 · Servicios, tarifas y horarios (propuesta)
+## Sprint 3 · Entregado
 
-1. **Mis servicios**: crear, editar, ordenar y desactivar servicios con duración, margen y precio individuales.
-2. **Mis horarios**: horario semanal con jornada partida y validación de franjas sin solapes (restricción en PostgreSQL).
-3. **Excepciones**: días libres, vacaciones y disponibilidad extra (`schedule_exceptions`).
-4. **Cálculo de disponibilidad** en PostgreSQL (`get_available_slots`), base del motor de reservas de los sprints 4 y 5.
-5. **Pruebas**: RLS de servicios/horarios, cálculo de huecos con cambios de hora y jornada partida.
+Detalle: [docs/sprints/sprint-3.md](docs/sprints/sprint-3.md).
+
+- [x] **Mis servicios**: alta, edición, desactivación y borrado (si tiene citas, se desactiva) con duración, margen y precio propios
+- [x] **Mis horarios**: horario semanal con jornada partida, versionado desde hoy y sin solapes (`EXCLUDE` en PostgreSQL)
+- [x] **Excepciones** privadas: días libres, bloqueos y horario extra
+- [x] **Disponibilidad** calculada en PostgreSQL (`get_available_slots`), con vista previa en *Mis horarios*
+- [x] Pruebas: 120 Vitest (18 SQL de horarios y huecos, 11 unitarias) y 17 Playwright
+
+## Sprint 4 · Agenda (propuesta)
+
+1. **Mi agenda**: vista diaria y semanal con citas, bloqueos y huecos libres.
+2. **Mis clientes**: cartera privada (alta rápida, búsqueda por nombre o teléfono, notas).
+3. **Crear cita** desde la agenda en una función transaccional que reutiliza el cálculo de huecos y respeta excepciones y margen.
+4. **Cambiar estado**: completada, no presentada, cancelada con motivo; bitácora en `appointment_events`.
+5. **Pruebas**: concurrencia (dos citas al mismo hueco), RLS de clientes y citas, flujo de agenda en E2E.

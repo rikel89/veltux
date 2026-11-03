@@ -49,6 +49,9 @@ export const phoneSchema = z
 export const optional = <T extends z.ZodType>(schema: T) =>
   z.preprocess((v) => (v === undefined || (typeof v === "string" && v.trim() === "") ? null : v), schema.nullable());
 
+/** Casilla de verificación de formulario ("on" cuando está marcada). */
+export const checkbox = z.preprocess((v) => v === "on" || v === "true" || v === true, z.boolean());
+
 /** Email normalizado: se recorta y pasa a minúsculas ANTES de validar. */
 export const emailSchema = (message = "Introduce un email válido") =>
   z.string().trim().toLowerCase().pipe(z.email(message));

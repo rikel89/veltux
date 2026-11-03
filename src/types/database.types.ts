@@ -1137,6 +1137,18 @@ export type Database = {
         }
         Returns: string
       }
+      get_available_slots: {
+        Args: {
+          p_from: string
+          p_service_id: string
+          p_step_minutes?: number
+          p_to: string
+        }
+        Returns: {
+          ends_at: string
+          starts_at: string
+        }[]
+      }
       get_my_access: { Args: never; Returns: Json }
       get_public_salon: { Args: { p_slug: string }; Returns: Json }
       get_salon_occupancy: {
@@ -1156,6 +1168,10 @@ export type Database = {
           p_slug: string
         }
         Returns: string
+      }
+      replace_my_weekly_schedule: {
+        Args: { p_professional_id: string; p_slots: Json }
+        Returns: number
       }
       set_professional_active: {
         Args: {

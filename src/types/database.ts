@@ -10,3 +10,4 @@ export type SalonKind = Enums<"salon_kind">;
 export type ProfessionalStatus = Enums<"professional_status">;
 export type SubscriptionStatus = Enums<"subscription_status">;
 export type NotificationStatus = Enums<"notification_status">;
+export type ScheduleExceptionType = Enums<"schedule_exception_type">;

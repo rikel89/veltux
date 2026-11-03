@@ -1,5 +1,6 @@
 import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import type { ProfessionalStatus } from "@/types/database";
 import type { Database } from "@/types/database.types";
 
 type Client = SupabaseClient<Database>;
@@ -12,13 +13,14 @@ export type ProfessionalContext = {
   salonSlug: string;
   timeZone: string;
   hasActiveLicense: boolean;
+  status: ProfessionalStatus;
 };
 
 /** Ficha profesional del usuario autenticado (RLS limita el alcance al salón). */
 export async function getMyProfessionalContext(supabase: Client, userId: string): Promise<ProfessionalContext | null> {
   const { data: professional, error } = await supabase
     .from("professionals")
-    .select("id, display_name, salon_id")
+    .select("id, display_name, salon_id, status")
     .eq("user_id", userId)
     .order("created_at")
     .limit(1)
@@ -45,6 +47,7 @@ export async function getMyProfessionalContext(supabase: Client, userId: string)
     salonSlug: salon.data.slug,
     timeZone: salon.data.timezone,
     hasActiveLicense: (license.count ?? 0) > 0,
+    status: professional.status,
   };
 }
 
