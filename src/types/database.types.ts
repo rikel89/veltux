@@ -1248,6 +1248,15 @@ export type Database = {
       }
       get_my_access: { Args: never; Returns: Json }
       get_public_salon: { Args: { p_slug: string }; Returns: Json }
+      get_salon_agenda_overview: {
+        Args: { p_from: string; p_salon_id: string; p_to: string }
+        Returns: {
+          ends_at: string
+          kind: string
+          professional_id: string
+          starts_at: string
+        }[]
+      }
       get_salon_occupancy: {
         Args: { p_from: string; p_salon_id: string; p_to: string }
         Returns: {

@@ -18,7 +18,7 @@ import {
 import type { Area } from "@/modules/auth/access-rules";
 
 /** Sprint en curso: las secciones de sprints posteriores muestran su etiqueta. */
-export const CURRENT_SPRINT = 6;
+export const CURRENT_SPRINT = 7;
 
 export type NavItem = {
   label: string;
@@ -116,7 +116,7 @@ export const NAVS: Record<Area, AreaNav> = {
         href: "/propietario/agendas",
         icon: CalendarRange,
         sprint: 7,
-        description: "Ocupación de todas las agendas, sin acceso a datos de clientes ni posibilidad de modificar citas.",
+        description: "Ocupación de todas las agendas, sin datos de clientes ni posibilidad de modificar citas.",
       },
       {
         label: "Profesionales",

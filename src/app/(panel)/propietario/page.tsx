@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { connection } from "next/server";
 import { CalendarRange, KeyRound, Settings, ShieldCheck, Users } from "lucide-react";
 import { StatCard } from "@/components/dashboard/stat-card";
 import { CopyBookingLink } from "@/components/dashboard/copy-booking-link";
@@ -7,6 +8,8 @@ import { PageHeader } from "@/components/layout/page-header";
 import { Button } from "@/components/ui/button";
 import { initials } from "@/lib/format";
 import { ownerSalon, requireArea } from "@/modules/auth/access";
+import { buildLoads } from "@/modules/salons/overview";
+import { currentWeekKeys, getSalonOverview } from "@/modules/salons/overview-queries";
 import { getOwnerSalonSummary } from "@/modules/salons/queries";
 
 export const metadata: Metadata = { title: "Mi establecimiento" };
@@ -23,6 +26,13 @@ export default async function OwnerDashboardPage() {
 
   const { salon, subscription, licensesInUse, professionals } = summary;
   const quantity = subscription?.license_quantity ?? 0;
+
+  await connection(); // la semana en curso depende de la fecha actual
+  const weekKeys = currentWeekKeys(new Date(), salon.timezone);
+  const overview = await getSalonOverview(salon.id, weekKeys);
+  const weekTotals = overview
+    ? buildLoads(overview.professionals, weekKeys, overview.schedule, overview.spans, overview.timeZone).totals
+    : null;
 
   return (
     <div className="mx-auto flex max-w-[1400px] flex-col gap-6">
@@ -58,7 +68,12 @@ export default async function OwnerDashboardPage() {
               : undefined
           }
         />
-        <StatCard icon={CalendarRange} label="Ocupación de agendas" value="—" hint="Disponible en el Sprint 7" />
+        <StatCard
+          icon={CalendarRange}
+          label="Ocupación esta semana"
+          value={weekTotals?.percentage === null || !weekTotals ? "—" : `${weekTotals.percentage}%`}
+          hint={weekTotals && weekTotals.availableMinutes > 0 ? "De todas las agendas" : "Sin horarios publicados"}
+        />
       </div>
 
       <div className="grid gap-5 lg:grid-cols-3 lg:gap-6">

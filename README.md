@@ -211,8 +211,17 @@ Detalle: [docs/sprints/sprint-6.md](docs/sprints/sprint-6.md).
 
 **Pendiente de decisión:** proveedor de SMS y tarea programada que procese la cola.
 
-## Sprint 7 · Panel del propietario (propuesta)
+## Sprint 7 · Entregado
 
-1. **Vista de agendas**: ocupación de todas las agendas sin datos de clientes ni posibilidad de modificar citas (`get_salon_occupancy`).
-2. **Métricas del establecimiento**: ocupación por profesional y por semana.
-3. **Pruebas**: el propietario nunca accede a clientes, notas ni detalles de citas.
+Detalle: [docs/sprints/sprint-7.md](docs/sprints/sprint-7.md).
+
+- [x] **Vista de agendas**: ocupación semanal por profesional y detalle de cada día, de solo lectura
+- [x] **Resumen**: ocupación, tiempo reservado y tiempo libre; ocupación de la semana en el dashboard
+- [x] **Privacidad**: franjas anónimas, sin clientes, servicios, precios ni motivos
+
+## Sprint 8 · Pruebas y piloto (propuesta)
+
+1. **Flujos con sesión real** en E2E contra un Supabase local: propietario, profesional y cliente.
+2. **Concurrencia real**: dos reservas simultáneas al mismo hueco, con varias conexiones.
+3. **Estadísticas y configuración de la plataforma** para el administrador.
+4. **Preparación del piloto**: lista de comprobación, datos iniciales, SMTP propio, proveedor de SMS y tarea programada.
