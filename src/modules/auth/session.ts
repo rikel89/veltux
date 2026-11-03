@@ -1,5 +1,6 @@
 import "server-only";
 import { redirect } from "next/navigation";
+import { connection } from "next/server";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 import { createClient } from "@/lib/supabase/server";
 
@@ -16,6 +17,9 @@ export type Session =
 export async function requireSession(): Promise<Session> {
   if (!isSupabaseConfigured()) return { mode: "demo" };
 
+  // getClaims() compara la caducidad del token con la hora actual: debe
+  // evaluarse siempre en tiempo de petición, nunca durante el prerender.
+  await connection();
   const supabase = await createClient();
   const { data, error } = await supabase.auth.getClaims();
   const sub = data?.claims?.sub;
