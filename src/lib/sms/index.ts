@@ -1,6 +1,6 @@
 import "server-only";
 
-export type SmsResult = { ok: true } | { ok: false; error: string };
+export type SmsResult = { ok: true; messageId?: string } | { ok: false; error: string };
 
 export interface SmsSender {
   readonly name: string;
@@ -8,8 +8,8 @@ export interface SmsSender {
 }
 
 /**
- * Envío simulado para desarrollo: escribe el mensaje en la consola del
- * servidor. Nunca se usa en producción.
+ * Salida de desarrollo para los códigos de reserva: escribe el mensaje en la
+ * consola del servidor. No envía nada y nunca se usa en producción.
  */
 const consoleSender: SmsSender = {
   name: "console",
@@ -20,13 +20,19 @@ const consoleSender: SmsSender = {
 };
 
 /**
- * Proveedor de SMS configurado, o null si no hay ninguno: sin proveedor la
- * reserva online se desactiva en lugar de fingir que se ha enviado un código.
- * El proveedor real (Twilio, Vonage…) se conecta aquí cuando se elija.
+ * Proveedor real configurado, o null. La cola de notificaciones solo usa este:
+ * sin proveedor los mensajes siguen en estado pendiente y nada figura como enviado.
+ * El proveedor (Twilio, Vonage…) se conecta aquí cuando se elija.
  */
-export function getSmsSender(): SmsSender | null {
-  const provider = process.env.SMS_PROVIDER?.trim();
-  if (process.env.NODE_ENV === "production") return null;
-  if (!provider || provider === "console") return consoleSender;
+export function getRealSmsSender(): SmsSender | null {
   return null;
+}
+
+/** Para el código de reserva: el proveedor real o, solo en desarrollo, la consola. */
+export function getSmsSender(): SmsSender | null {
+  const real = getRealSmsSender();
+  if (real) return real;
+  if (process.env.NODE_ENV === "production") return null;
+  const provider = process.env.SMS_PROVIDER?.trim();
+  return !provider || provider === "console" ? consoleSender : null;
 }

@@ -200,10 +200,19 @@ Detalle: [docs/sprints/sprint-5.md](docs/sprints/sprint-5.md).
 
 **Pendiente de decisión:** proveedor de SMS (Twilio, Vonage, MessageBird…) y sus credenciales.
 
-## Sprint 6 · Imprevistos y notificaciones (propuesta)
+## Sprint 6 · Entregado
 
-1. **Proveedor de SMS real** detrás de la interfaz `src/lib/sms` y cola `notifications` (`claim_pending_notifications`).
-2. **Confirmación y recordatorio** de cita por SMS (24 h antes) y aviso al cancelar o mover.
-3. **Gestionar imprevisto**: bloquear un tramo y resolver las citas afectadas (cancelar avisando, mover o pedir reasignación a otro profesional).
-4. **Enlace de gestión para el cliente**: cancelar su cita desde el SMS sin cuenta.
-5. **Pruebas**: cola con reintentos, idempotencia, flujo de imprevisto.
+Detalle: [docs/sprints/sprint-6.md](docs/sprints/sprint-6.md).
+
+- [x] **Gestionar imprevisto**: citas afectadas por jornada, bloquear, cancelar una o todas, proponer otra hora y reasignar
+- [x] **Reasignación** con aceptación del receptor y confirmación del cliente, sin exponer datos del cliente antes de tiempo
+- [x] **Página del cliente** con enlace firmado: responder a propuestas y cancelar sin cuenta
+- [x] **Cola de notificaciones** con reintentos e idempotencia; sin proveedor los mensajes siguen pendientes y nada figura como enviado
+
+**Pendiente de decisión:** proveedor de SMS y tarea programada que procese la cola.
+
+## Sprint 7 · Panel del propietario (propuesta)
+
+1. **Vista de agendas**: ocupación de todas las agendas sin datos de clientes ni posibilidad de modificar citas (`get_salon_occupancy`).
+2. **Métricas del establecimiento**: ocupación por profesional y por semana.
+3. **Pruebas**: el propietario nunca accede a clientes, notas ni detalles de citas.

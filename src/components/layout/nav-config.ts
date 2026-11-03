@@ -18,7 +18,7 @@ import {
 import type { Area } from "@/modules/auth/access-rules";
 
 /** Sprint en curso: las secciones de sprints posteriores muestran su etiqueta. */
-export const CURRENT_SPRINT = 4;
+export const CURRENT_SPRINT = 6;
 
 export type NavItem = {
   label: string;
@@ -83,7 +83,7 @@ export const NAVS: Record<Area, AreaNav> = {
         href: "/profesional/notificaciones",
         icon: Bell,
         sprint: 6,
-        description: "Historial de SMS enviados a tus clientes y su estado de entrega.",
+        description: "Los SMS a tus clientes y su estado de entrega.",
       },
       {
         label: "Mi perfil",

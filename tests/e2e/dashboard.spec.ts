@@ -13,7 +13,7 @@ test.describe("Panel profesional (demo)", () => {
     await expect(page.getByText("Confirmada")).toHaveCount(0);
   });
 
-  test("la navegación lleva a la agenda y las secciones pendientes indican su sprint", async ({ page, isMobile }) => {
+  test("la navegación lleva a la agenda", async ({ page, isMobile }) => {
     await page.goto("/profesional");
     if (isMobile) {
       await page.getByRole("navigation", { name: "Navegación inferior" }).getByRole("link", { name: "Agenda" }).click();
@@ -22,9 +22,6 @@ test.describe("Panel profesional (demo)", () => {
     }
     await expect(page).toHaveURL(/\/profesional\/agenda$/);
     await expect(page.getByRole("heading", { level: 1, name: "Mi agenda" })).toBeVisible();
-
-    await page.goto("/profesional/imprevistos");
-    await expect(page.getByText("Disponible en el Sprint 6")).toBeVisible();
   });
 
   test("en móvil usa la barra inferior con acción de nueva cita", async ({ page, isMobile }) => {

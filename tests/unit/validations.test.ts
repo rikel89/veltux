@@ -13,9 +13,13 @@ import { newPasswordSchema, signInSchema } from "@/modules/auth/schemas";
 
 describe("slugs de establecimiento", () => {
   it("coinciden con la lista reservada de la restricción CHECK en PostgreSQL", () => {
-    const sql = readFileSync(join(process.cwd(), "supabase/migrations/20261103120000_initial_schema.sql"), "utf8");
-    const block = sql.match(/check \(slug not in \(([\s\S]*?)\)\)/)?.[1] ?? "";
-    const dbList = [...block.matchAll(/'([^']+)'/g)].map((m) => m[1]).sort();
+    const dbList = ["20261103120000_initial_schema.sql", "20261107090000_sprint6_incidents_notifications.sql"]
+      .flatMap((file) => {
+        const sql = readFileSync(join(process.cwd(), "supabase/migrations", file), "utf8");
+        const block = sql.match(/check \(slug not in \(([\s\S]*?)\)\)/)?.[1] ?? "";
+        return [...block.matchAll(/'([^']+)'/g)].map((m) => m[1]);
+      })
+      .sort();
     expect([...RESERVED_SALON_SLUGS].sort()).toEqual(dbList);
   });
 

@@ -6,7 +6,7 @@ import { z } from "zod";
  * estas reglas solo dan mensajes claros antes de llegar a ella.
  */
 
-/** Slugs reservados por rutas de la aplicación (igual que salons.slug CHECK). */
+/** Slugs reservados por rutas de la aplicación (igual que las restricciones CHECK de salons.slug). */
 export const RESERVED_SALON_SLUGS = [
   "admin",
   "api",
@@ -23,6 +23,11 @@ export const RESERVED_SALON_SLUGS = [
   "static",
   "www",
   "veltux",
+  "panel",
+  "cuenta",
+  "recuperar",
+  "sin-acceso",
+  "cita",
 ] as const;
 
 export const salonSlugSchema = z

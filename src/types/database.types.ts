@@ -1137,6 +1137,27 @@ export type Database = {
         Args: { p_quantity: number; p_salon_id: string }
         Returns: undefined
       }
+      block_my_day: {
+        Args: { p_date: string; p_professional_id: string; p_reason?: string }
+        Returns: string
+      }
+      cancel_appointment_as_client: {
+        Args: { p_appointment_id: string }
+        Returns: boolean
+      }
+      cancel_my_change_request: {
+        Args: { p_request_id: string }
+        Returns: undefined
+      }
+      cancel_my_day_appointments: {
+        Args: {
+          p_date: string
+          p_ids?: string[]
+          p_professional_id: string
+          p_reason?: string
+        }
+        Returns: number
+      }
       claim_pending_notifications: {
         Args: { p_batch_size?: number }
         Returns: {
@@ -1209,6 +1230,10 @@ export type Database = {
         }
         Returns: string
       }
+      get_appointment_for_client: {
+        Args: { p_appointment_id: string }
+        Returns: Json
+      }
       get_available_slots: {
         Args: {
           p_from: string
@@ -1241,6 +1266,42 @@ export type Database = {
         }
         Returns: string
       }
+      my_incoming_reassignments: {
+        Args: never
+        Returns: {
+          currency: string
+          ends_at: string
+          expires_at: string
+          message: string
+          price_cents: number
+          request_id: string
+          requester_name: string
+          service_name: string
+          starts_at: string
+        }[]
+      }
+      propose_reschedule: {
+        Args: {
+          p_appointment_id: string
+          p_message?: string
+          p_starts_at: string
+        }
+        Returns: string
+      }
+      record_notification_delivered: {
+        Args: { p_message_id: string; p_provider: string }
+        Returns: boolean
+      }
+      record_notification_result: {
+        Args: {
+          p_error?: string
+          p_id: string
+          p_message_id?: string
+          p_ok: boolean
+          p_provider: string
+        }
+        Returns: Database["public"]["Enums"]["notification_status"]
+      }
       replace_my_weekly_schedule: {
         Args: { p_professional_id: string; p_slots: Json }
         Returns: number
@@ -1253,12 +1314,28 @@ export type Database = {
           otp_id: string
         }[]
       }
+      request_reassignment: {
+        Args: {
+          p_appointment_id: string
+          p_message?: string
+          p_target_professional_id: string
+        }
+        Returns: string
+      }
       reschedule_my_appointment: {
         Args: {
           p_appointment_id: string
           p_force?: boolean
           p_starts_at: string
         }
+        Returns: undefined
+      }
+      respond_change_request_as_client: {
+        Args: { p_accept: boolean; p_appointment_id: string }
+        Returns: string
+      }
+      respond_my_reassignment: {
+        Args: { p_accept: boolean; p_request_id: string; p_service_id?: string }
         Returns: undefined
       }
       set_my_appointment_status: {
