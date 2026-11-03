@@ -18,7 +18,7 @@ import {
 import type { Area } from "@/modules/auth/access-rules";
 
 /** Sprint en curso: las secciones de sprints posteriores muestran su etiqueta. */
-export const CURRENT_SPRINT = 3;
+export const CURRENT_SPRINT = 4;
 
 export type NavItem = {
   label: string;
@@ -105,7 +105,7 @@ export const NAVS: Record<Area, AreaNav> = {
       { href: "/profesional/agenda", label: "Agenda" },
       { href: "/profesional/clientes", label: "Clientes" },
     ],
-    mobileAction: { href: "/profesional/agenda", label: "Nueva cita" },
+    mobileAction: { href: "/profesional/agenda?nueva=1", label: "Nueva cita" },
   },
   owner: {
     sectionLabel: "Establecimiento",

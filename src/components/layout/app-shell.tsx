@@ -28,7 +28,10 @@ export function AppShell({ area, children }: { area: Area; children: ReactNode }
           </Suspense>
         </main>
       </div>
-      <MobileTabBar area={area} />
+      {/* Lee la ruta actual: en rutas con parámetros dinámicos se resuelve al pedirla. */}
+      <Suspense fallback={null}>
+        <MobileTabBar area={area} />
+      </Suspense>
     </div>
   );
 }

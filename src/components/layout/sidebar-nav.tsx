@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { Suspense } from "react";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import type { Area } from "@/modules/auth/access-rules";
@@ -9,13 +10,27 @@ import { CURRENT_SPRINT, isNavItemActive, NAVS } from "./nav-config";
 // Los iconos son componentes: la lista se resuelve aquí a partir del área, no se pasa desde el servidor.
 type Props = { area: Area; onNavigate?: () => void };
 
-export function SidebarNav({ area, onNavigate }: Props) {
-  const pathname = usePathname();
+/**
+ * En rutas con parámetros dinámicos la ruta solo se conoce al pedirla: mientras
+ * tanto se muestra la misma lista sin elemento activo (Cache Components).
+ */
+export function SidebarNav(props: Props) {
+  return (
+    <Suspense fallback={<NavList {...props} pathname={null} />}>
+      <ActiveNav {...props} />
+    </Suspense>
+  );
+}
 
+function ActiveNav(props: Props) {
+  return <NavList {...props} pathname={usePathname()} />;
+}
+
+function NavList({ area, onNavigate, pathname }: Props & { pathname: string | null }) {
   return (
     <nav aria-label="Navegación principal" className="flex flex-col gap-1">
       {NAVS[area].items.map((item) => {
-        const active = isNavItemActive(pathname, item.href);
+        const active = pathname !== null && isNavItemActive(pathname, item.href);
         const Icon = item.icon;
         return (
           <Link

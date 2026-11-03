@@ -1121,6 +1121,16 @@ export type Database = {
           isSetofReturn: true
         }
       }
+      create_my_appointment: {
+        Args: {
+          p_client_id: string
+          p_force?: boolean
+          p_notes?: string
+          p_service_id: string
+          p_starts_at: string
+        }
+        Returns: string
+      }
       create_salon_with_owner: {
         Args: {
           p_license_quantity?: number
@@ -1172,6 +1182,22 @@ export type Database = {
       replace_my_weekly_schedule: {
         Args: { p_professional_id: string; p_slots: Json }
         Returns: number
+      }
+      reschedule_my_appointment: {
+        Args: {
+          p_appointment_id: string
+          p_force?: boolean
+          p_starts_at: string
+        }
+        Returns: undefined
+      }
+      set_my_appointment_status: {
+        Args: {
+          p_appointment_id: string
+          p_reason?: string
+          p_status: Database["public"]["Enums"]["appointment_status"]
+        }
+        Returns: undefined
       }
       set_professional_active: {
         Args: {

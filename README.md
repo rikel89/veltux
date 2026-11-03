@@ -177,10 +177,19 @@ Detalle: [docs/sprints/sprint-3.md](docs/sprints/sprint-3.md).
 - [x] **Disponibilidad** calculada en PostgreSQL (`get_available_slots`), con vista previa en *Mis horarios*
 - [x] Pruebas: 120 Vitest (18 SQL de horarios y huecos, 11 unitarias) y 17 Playwright
 
-## Sprint 4 · Agenda (propuesta)
+## Sprint 4 · Entregado
 
-1. **Mi agenda**: vista diaria y semanal con citas, bloqueos y huecos libres.
-2. **Mis clientes**: cartera privada (alta rápida, búsqueda por nombre o teléfono, notas).
-3. **Crear cita** desde la agenda en una función transaccional que reutiliza el cálculo de huecos y respeta excepciones y margen.
-4. **Cambiar estado**: completada, no presentada, cancelada con motivo; bitácora en `appointment_events`.
-5. **Pruebas**: concurrencia (dos citas al mismo hueco), RLS de clientes y citas, flujo de agenda en E2E.
+Detalle: [docs/sprints/sprint-4.md](docs/sprints/sprint-4.md).
+
+- [x] **Mi agenda**: vista de día y de semana con horario, días libres, bloqueos y citas; tocar un hueco crea una cita a esa hora
+- [x] **Citas** creadas, movidas y cerradas solo con funciones transaccionales (`create_my_appointment`, `reschedule_my_appointment`, `set_my_appointment_status`) que reutilizan el cálculo de huecos
+- [x] **Mis clientes**: cartera privada con búsqueda, alta rápida desde la cita, ficha con notas e historial, archivado
+- [x] Pruebas: 144 Vitest (16 SQL de agenda, 9 unitarias) y 23 Playwright
+
+## Sprint 5 · Reserva pública + OTP (propuesta)
+
+1. **Página pública** `veltux.es/{salón}/{profesional}`: servicios públicos y huecos de `get_available_slots`.
+2. **Verificación del teléfono por SMS (OTP)** antes de reservar; límite de intentos y caducidad.
+3. **Reserva pública** transaccional (`source = public_portal`) que crea o reutiliza el cliente en la cartera del profesional.
+4. **Antelación mínima y horizonte** configurables por profesional.
+5. **Pruebas**: abuso (límite de OTP), carrera por el mismo hueco, datos que nunca se exponen al público.

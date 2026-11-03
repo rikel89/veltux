@@ -1,5 +1,5 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { asAnon, asUser, createTestDatabase, type Db } from "./harness";
+import { asAnon, asRole, asUser, createTestDatabase, type Db } from "./harness";
 import { ids, seedScenario } from "./fixtures";
 
 const { users, salons, professionals: p, services: s, clients: c, appointments: a } = ids;
@@ -80,7 +80,7 @@ describe("Citas", () => {
           [salons.a, p.proA1, c.clienteA1, s.corteA1],
         ),
       ),
-    ).rejects.toThrow(/row-level security/);
+    ).rejects.toThrow(/permission denied/);
   });
 
   it("el propietario no consulta directamente las citas de otros profesionales", async () => {
@@ -119,8 +119,9 @@ describe("Citas", () => {
 });
 
 describe("Motor de reservas · integridad en PostgreSQL", () => {
+  // Las restricciones se comprueban con escritura directa como service_role (la app solo escribe con funciones).
   const insertCita = (start: string, end: string, extra = "") =>
-    asUser(db, users.ownerA, (tx) =>
+    asRole(db, "service_role", null, (tx) =>
       tx.query(
         `insert into public.appointments (salon_id, professional_id, client_id, service_id, starts_at, ends_at ${extra ? ", status, cancelled_at" : ""})
          values ($1, $2, $3, $4, $5, $6 ${extra})`,
@@ -152,7 +153,7 @@ describe("Motor de reservas · integridad en PostgreSQL", () => {
 
   it("no permite reservar un servicio de otro profesional", async () => {
     await expect(
-      asUser(db, users.ownerA, (tx) =>
+      asRole(db, "service_role", null, (tx) =>
         tx.query(
           `insert into public.appointments (salon_id, professional_id, client_id, service_id, starts_at, ends_at)
            values ($1, $2, $3, $4, '2026-12-03 10:00+00', '2026-12-03 10:30+00')`,
@@ -172,10 +173,7 @@ describe("Motor de reservas · integridad en PostgreSQL", () => {
 
   it("registra los cambios en appointment_events", async () => {
     const events = await asUser(db, users.ownerA, async (tx) => {
-      await tx.query(
-        "update public.appointments set status = 'cancelled', cancelled_at = now(), cancel_reason = 'Imprevisto' where id = $1",
-        [a.citaA1],
-      );
+      await tx.query("select public.set_my_appointment_status($1, 'cancelled', 'Imprevisto')", [a.citaA1]);
       return tx.query<{ event_type: string; actor_user_id: string | null }>(
         "select event_type, actor_user_id from public.appointment_events where appointment_id = $1 order by created_at",
         [a.citaA1],

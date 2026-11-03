@@ -129,16 +129,15 @@ describe("set_professional_active()", () => {
       ),
     ).rejects.toThrow(/row-level security/);
 
-    // Trigger: sin licencia no puede recibir citas (se evalúa antes que RLS).
+    // Sin ficha activa no puede crear citas.
     await expect(
       asUser(db, users.userA2, (tx) =>
-        tx.query(
-          `insert into public.appointments (salon_id, professional_id, client_id, service_id, starts_at, ends_at)
-           values ($1, $2, $3, $4, '2026-12-09 10:00+00', '2026-12-09 10:45+00')`,
-          [salons.a, p.proA2, ids.clients.clienteA2, s.corteA2],
-        ),
+        tx.query("select public.create_my_appointment($1, $2, '2026-12-09 10:00+00', null, true)", [
+          s.corteA2,
+          ids.clients.clienteA2,
+        ]),
       ),
-    ).rejects.toThrow(/PROFESSIONAL_WITHOUT_LICENSE/);
+    ).rejects.toThrow(/SERVICE_NOT_FOUND/);
 
     await expect(
       asUser(db, users.ownerA, (tx) =>

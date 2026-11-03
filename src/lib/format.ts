@@ -23,3 +23,8 @@ export function initials(name: string): string {
   const last = parts.length > 1 ? parts[parts.length - 1][0] : "";
   return (first + last).toUpperCase();
 }
+
+/** Fecha corta de un instante en la zona del salón ("3 nov 2026"). */
+export function formatDate(instant: Date | string, timeZone: string): string {
+  return new Intl.DateTimeFormat(LOCALE, { timeZone, day: "numeric", month: "short", year: "numeric" }).format(new Date(instant));
+}
