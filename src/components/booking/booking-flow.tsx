@@ -43,7 +43,7 @@ export function BookingFlow({
   const [slots, setSlots] = useState<{ key: string; list: Slot[] | null; error?: string } | null>(null);
   const [slot, setSlot] = useState<Slot | null>(null);
   const [details, setDetails] = useState({ fullName: "", phone: "", email: "", notes: "" });
-  const [otp, setOtp] = useState<{ otpId: string; phone: string } | null>(null);
+  const [otp, setOtp] = useState<{ otpId: string; email: string } | null>(null);
   const [code, setCode] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<ApiError | null>(null);
@@ -77,7 +77,7 @@ export function BookingFlow({
   const requestCode = async () => {
     setBusy(true);
     setError(null);
-    const res = await postJson<{ otpId: string; phone: string }>("/api/public/otp", { professionalId: pro.id, phone: details.phone });
+    const res = await postJson<{ otpId: string; email: string }>("/api/public/otp", { professionalId: pro.id, email: details.email });
     setBusy(false);
     if (!res.ok) return setError(res.error);
     setOtp(res.data);
@@ -95,7 +95,7 @@ export function BookingFlow({
       serviceId: service.id,
       startsAt: slot.startsAt,
       fullName: details.fullName,
-      email: details.email,
+      phone: details.phone,
       notes: details.notes,
     });
     setBusy(false);
@@ -134,7 +134,7 @@ export function BookingFlow({
 
       {!bookingEnabled && (
         <p role="status" className="mt-5 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
-          La confirmación por SMS aún no está activa: puedes consultar servicios y horas libres, pero no reservar online. Llama al establecimiento para pedir cita.
+          La confirmación por email aún no está activa: puedes consultar servicios y horas libres, pero no reservar online. Llama al establecimiento para pedir cita.
         </p>
       )}
 
@@ -282,7 +282,7 @@ export function BookingFlow({
               className="h-12 rounded-xl bg-white text-base"
             />
           </Field>
-          <Field label="Teléfono móvil" id="b-phone" hint="Te enviaremos un código por SMS para confirmar la reserva." error={errorFor("phone")}>
+          <Field label="Teléfono móvil" id="b-phone" error={errorFor("phone")}>
             <Input
               id="b-phone"
               type="tel"
@@ -295,12 +295,13 @@ export function BookingFlow({
               className="h-12 rounded-xl bg-white text-base"
             />
           </Field>
-          <Field label="Email (opcional)" id="b-email" error={errorFor("email")}>
+          <Field label="Email" id="b-email" hint="Te enviaremos un código para confirmar la reserva, y aquí recibirás los avisos de tu cita." error={errorFor("email")}>
             <Input
               id="b-email"
               type="email"
               inputMode="email"
               autoComplete="email"
+              required
               value={details.email}
               onChange={(e) => setDetails({ ...details, email: e.target.value })}
               className="h-12 rounded-xl bg-white text-base"
@@ -318,8 +319,8 @@ export function BookingFlow({
           <p className="text-xs text-muted-foreground">
             Tus datos solo los ve {pro.display_name}, para gestionar tu cita y avisarte de cambios.
           </p>
-          <StickyAction type="submit" disabled={!bookingEnabled || busy || details.fullName.trim().length < 2 || details.phone.trim().length < 9} busy={busy}>
-            <MessageSquareText /> Enviar código por SMS
+          <StickyAction type="submit" disabled={!bookingEnabled || busy || details.fullName.trim().length < 2 || details.phone.trim().length < 9 || !details.email.includes("@")} busy={busy}>
+            <MessageSquareText /> Enviar código por email
           </StickyAction>
         </form>
       )}
@@ -337,7 +338,7 @@ export function BookingFlow({
             Escribe el código
           </h2>
           <p className="text-sm text-muted-foreground">
-            Te lo hemos enviado por SMS al <span className="font-semibold text-foreground tabular-nums">{otp.phone}</span>. Caduca en 10 minutos.
+            Te lo hemos enviado a <span className="font-semibold text-foreground">{otp.email}</span>. Caduca en 10 minutos. Si no lo ves, mira en la carpeta de spam.
           </p>
           <Field label="Código de 6 cifras" id="b-code" error={errorFor("code")}>
             <Input
@@ -353,7 +354,7 @@ export function BookingFlow({
             />
           </Field>
           <button type="button" className="text-sm font-semibold text-lime-ink underline-offset-4 hover:underline" onClick={() => go("details")}>
-            Cambiar el teléfono o pedir otro código
+            Cambiar el email o pedir otro código
           </button>
           <StickyAction type="submit" disabled={busy || code.length !== 6} busy={busy}>
             <CalendarCheck /> Confirmar reserva

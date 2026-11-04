@@ -27,10 +27,9 @@ export function ClientForm({ client, readOnly = false }: { client?: ClientDetail
           defaultValue={client?.phone}
           placeholder="600 000 000"
           required
-          hint="Lo usaremos para recordatorios por SMS (Sprint 6)."
           error={e.phone}
         />
-        <FormField id={id("email")} name="email" label="Email (opcional)" type="email" inputMode="email" defaultValue={client?.email ?? ""} error={e.email} />
+        <FormField id={id("email")} name="email" label="Email (opcional)" type="email" inputMode="email" defaultValue={client?.email ?? ""} hint="Sin email no recibirá confirmaciones ni recordatorios." error={e.email} />
         <FormTextarea
           id={id("notes")}
           name="notes"

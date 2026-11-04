@@ -226,8 +226,9 @@ Detalle: [docs/sprints/sprint-8.md](docs/sprints/sprint-8.md).
 - [x] **Concurrencia real** con PostgreSQL embebido (`npm run test:concurrency`), sin Docker
 - [x] **Estadísticas** agregadas y **preparación del piloto** para el administrador
 - [x] Página de error en castellano y cabeceras de seguridad
+- [x] **Reservas y avisos por email** con Brevo (plan gratuito), en lugar de SMS
 
-**Pendiente de decisión:** proveedor de SMS, tarea programada, SMTP propio y textos legales.
+**Pendiente:** cuenta de Brevo, `CRON_SECRET`, SMTP de las invitaciones y textos legales.
 
 ## Sprint 9 · Suscripciones y comercialización (propuesta)
 

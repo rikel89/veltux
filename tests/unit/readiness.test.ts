@@ -5,20 +5,20 @@ const status = (items: ReturnType<typeof buildReadiness>, id: string) => items.f
 
 describe("buildReadiness", () => {
   it("señala lo que falta sin proveedor, tarea ni dirección pública", () => {
-    const items = buildReadiness({ hasSecretKey: false, siteUrl: "http://localhost:3000", hasSmsProvider: false, hasCronSecret: false });
-    for (const id of ["secret", "site", "sms", "cron"]) expect(status(items, id)).toBe("pending");
+    const items = buildReadiness({ hasSecretKey: false, siteUrl: "http://localhost:3000", hasEmailProvider: false, hasCronSecret: false });
+    for (const id of ["secret", "site", "email", "cron"]) expect(status(items, id)).toBe("pending");
   });
 
   it("no da por hechas las cosas que no puede comprobar", () => {
-    const items = buildReadiness({ hasSecretKey: true, siteUrl: "https://veltux.vercel.app", hasSmsProvider: true, hasCronSecret: true });
+    const items = buildReadiness({ hasSecretKey: true, siteUrl: "https://veltux.vercel.app", hasEmailProvider: true, hasCronSecret: true });
     expect(status(items, "secret")).toBe("ok");
     expect(status(items, "site")).toBe("ok");
-    expect(status(items, "sms")).toBe("ok");
+    expect(status(items, "email")).toBe("ok");
     for (const id of ["cron", "auth", "smtp", "signup", "legal", "e2e"]) expect(status(items, id)).toBe("manual");
   });
 
   it("nunca incluye el valor de una clave", () => {
-    const text = JSON.stringify(buildReadiness({ hasSecretKey: true, siteUrl: "https://x.test", hasSmsProvider: false, hasCronSecret: true }));
+    const text = JSON.stringify(buildReadiness({ hasSecretKey: true, siteUrl: "https://x.test", hasEmailProvider: false, hasCronSecret: true }));
     expect(text).not.toMatch(/sb_secret|true|false/);
   });
 });

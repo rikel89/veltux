@@ -7,7 +7,7 @@ import { ArrowLeft } from "lucide-react";
 import { BookingFlow } from "@/components/booking/booking-flow";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toLocalDateKey } from "@/lib/datetime";
-import { getSmsSender } from "@/lib/sms";
+import { getEmailSender } from "@/lib/email";
 import { getPublicSalon } from "@/modules/booking/server";
 
 export const metadata: Metadata = { title: "Reservar cita" };
@@ -38,7 +38,7 @@ async function BookingContent({ params }: { params: PageProps<"/[salon]/[profesi
         salon={salon}
         professional={professional}
         todayKey={toLocalDateKey(new Date(), salon.timezone)}
-        bookingEnabled={getSmsSender() !== null && Boolean(process.env.SUPABASE_SECRET_KEY)}
+        bookingEnabled={getEmailSender() !== null && Boolean(process.env.SUPABASE_SECRET_KEY)}
       />
     </>
   );

@@ -55,11 +55,12 @@ describe("validación de la API pública", () => {
     serviceId: "6f1c2d3e-4a5b-4c6d-8e9f-0a1b2c3d4e50",
     startsAt: "2026-12-01T09:00:00Z",
     fullName: "Laura",
+    phone: "+34600112233",
   };
 
   it("acepta una reserva válida y normaliza código y email", () => {
-    const v = bookingRequestSchema.parse({ ...base, email: " Laura@Mail.com ", notes: "" });
-    expect(v).toMatchObject({ code: "123456", email: "laura@mail.com", notes: null });
+    const v = bookingRequestSchema.parse({ ...base, phone: "600 11 22 33", notes: "" });
+    expect(v).toMatchObject({ code: "123456", phone: "+34600112233", notes: null });
   });
 
   it("rechaza códigos, fechas y nombres no válidos", () => {
@@ -68,8 +69,9 @@ describe("validación de la API pública", () => {
     expect(bookingRequestSchema.safeParse({ ...base, fullName: "L" }).success).toBe(false);
   });
 
-  it("normaliza el teléfono al pedir el código", () => {
-    expect(otpRequestSchema.parse({ professionalId: base.otpId, phone: "600 11 22 33" }).phone).toBe("+34600112233");
+  it("normaliza el email al pedir el código", () => {
+    expect(otpRequestSchema.parse({ professionalId: base.otpId, email: " Laura@Mail.com " }).email).toBe("laura@mail.com");
+    expect(otpRequestSchema.safeParse({ professionalId: base.otpId, email: "laura" }).success).toBe(false);
   });
 
   it("traduce solo errores conocidos; el resto es un error genérico", () => {
@@ -100,13 +102,16 @@ describe("protecciones del servidor", () => {
     expect(hash).not.toContain("203");
   });
 
-  it("nunca simula SMS en producción", async () => {
-    const { getSmsSender } = await import("@/lib/sms");
+  it("nunca simula correos en producción", async () => {
+    const { getEmailSender, getRealEmailSender } = await import("@/lib/email");
+    vi.stubEnv("BREVO_API_KEY", "");
     vi.stubEnv("NODE_ENV", "production");
-    expect(getSmsSender()).toBeNull();
+    expect(getEmailSender()).toBeNull();
     vi.stubEnv("NODE_ENV", "development");
-    expect(getSmsSender()?.name).toBe("console");
-    vi.stubEnv("SMS_PROVIDER", "twilio");
-    expect(getSmsSender()).toBeNull(); // proveedor aún no conectado
+    expect(getEmailSender()?.name).toBe("console");
+    expect(getRealEmailSender()).toBeNull();
+    vi.stubEnv("BREVO_API_KEY", "clave");
+    vi.stubEnv("EMAIL_FROM_ADDRESS", "citas@veltux.test");
+    expect(getEmailSender()?.name).toBe("brevo");
   });
 });

@@ -83,7 +83,7 @@ export const NAVS: Record<Area, AreaNav> = {
         href: "/profesional/notificaciones",
         icon: Bell,
         sprint: 6,
-        description: "Los SMS a tus clientes y su estado de entrega.",
+        description: "Los emails a tus clientes y su estado de entrega.",
       },
       {
         label: "Mi perfil",

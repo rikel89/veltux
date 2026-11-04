@@ -41,15 +41,29 @@ const templates = async (tx: Transaction | Db, appointment = CITA) =>
 
 describe("Cola de notificaciones", () => {
   it("una cita nueva encola la confirmación y el recordatorio 24 h antes, ambos pendientes", async () => {
-    const { rows } = await db.query<{ template: string; status: string; phone: string; early: boolean }>(
-      `select template, status, recipient_phone as phone, next_attempt_at = '2027-02-28 09:00+00' as early
+    const { rows } = await db.query<{ template: string; status: string; channel: string; email: string; early: boolean }>(
+      `select template, status, channel, recipient_email as email, next_attempt_at = '2027-02-28 09:00+00' as early
        from public.notifications where appointment_id = $1 order by template`,
       [CITA],
     );
     expect(rows).toEqual([
-      { template: "appointment.created", status: "pending", phone: "+34611111111", early: false },
-      { template: "appointment.reminder", status: "pending", phone: "+34611111111", early: true },
+      { template: "appointment.created", status: "pending", channel: "email", email: "carlos.cliente@veltux.test", early: false },
+      { template: "appointment.reminder", status: "pending", channel: "email", email: "carlos.cliente@veltux.test", early: true },
     ]);
+  });
+
+  it("sin email en la ficha ni en la cita no se encola nada", async () => {
+    await db.exec(`update public.clients set email = null where id = '${c.clienteA1}'`);
+    await db.exec(`
+      insert into public.appointments (id, salon_id, professional_id, client_id, service_id, starts_at, ends_at) values
+        ('50000000-0000-4000-8000-0000000000c4', '${salons.a}', '${p.proA1}', '${c.clienteA1}', '${s.corteA1}', '${AT("11:00")}', '${AT("11:30")}');
+    `);
+    expect(await templates(db, "50000000-0000-4000-8000-0000000000c4")).toEqual([]);
+  });
+
+  it("la cita guarda el email de contacto de la ficha", async () => {
+    const { rows } = await db.query<{ contact_email: string }>("select contact_email from public.appointments where id = $1", [CITA]);
+    expect(rows[0].contact_email).toBe("carlos.cliente@veltux.test");
   });
 
   it("una cita pasada no avisa a nadie", async () => {

@@ -218,6 +218,7 @@ export type Database = {
           cancel_reason: string | null
           cancelled_at: string | null
           client_id: string
+          contact_email: string | null
           created_at: string
           created_by: string | null
           currency: string
@@ -238,6 +239,7 @@ export type Database = {
           cancel_reason?: string | null
           cancelled_at?: string | null
           client_id: string
+          contact_email?: string | null
           created_at?: string
           created_by?: string | null
           currency?: string
@@ -258,6 +260,7 @@ export type Database = {
           cancel_reason?: string | null
           cancelled_at?: string | null
           client_id?: string
+          contact_email?: string | null
           created_at?: string
           created_by?: string | null
           currency?: string
@@ -359,10 +362,11 @@ export type Database = {
           code_hash: string
           consumed_at: string | null
           created_at: string
+          email: string | null
           expires_at: string
           id: string
           ip_hash: string | null
-          phone: string
+          phone: string | null
           professional_id: string
         }
         Insert: {
@@ -370,10 +374,11 @@ export type Database = {
           code_hash: string
           consumed_at?: string | null
           created_at?: string
+          email?: string | null
           expires_at?: string
           id?: string
           ip_hash?: string | null
-          phone: string
+          phone?: string | null
           professional_id: string
         }
         Update: {
@@ -381,10 +386,11 @@ export type Database = {
           code_hash?: string
           consumed_at?: string | null
           created_at?: string
+          email?: string | null
           expires_at?: string
           id?: string
           ip_hash?: string | null
-          phone?: string
+          phone?: string | null
           professional_id?: string
         }
         Relationships: [
@@ -402,6 +408,7 @@ export type Database = {
           archived_at: string | null
           created_at: string
           email: string | null
+          email_verified_at: string | null
           full_name: string
           global_client_id: string | null
           id: string
@@ -417,6 +424,7 @@ export type Database = {
           archived_at?: string | null
           created_at?: string
           email?: string | null
+          email_verified_at?: string | null
           full_name: string
           global_client_id?: string | null
           id?: string
@@ -432,6 +440,7 @@ export type Database = {
           archived_at?: string | null
           created_at?: string
           email?: string | null
+          email_verified_at?: string | null
           full_name?: string
           global_client_id?: string | null
           id?: string
@@ -526,6 +535,7 @@ export type Database = {
           professional_id: string | null
           provider: string | null
           provider_message_id: string | null
+          recipient_email: string | null
           recipient_phone: string | null
           recipient_user_id: string | null
           salon_id: string
@@ -551,6 +561,7 @@ export type Database = {
           professional_id?: string | null
           provider?: string | null
           provider_message_id?: string | null
+          recipient_email?: string | null
           recipient_phone?: string | null
           recipient_user_id?: string | null
           salon_id: string
@@ -576,6 +587,7 @@ export type Database = {
           professional_id?: string | null
           provider?: string | null
           provider_message_id?: string | null
+          recipient_email?: string | null
           recipient_phone?: string | null
           recipient_user_id?: string | null
           salon_id?: string
@@ -1178,6 +1190,7 @@ export type Database = {
           professional_id: string | null
           provider: string | null
           provider_message_id: string | null
+          recipient_email: string | null
           recipient_phone: string | null
           recipient_user_id: string | null
           salon_id: string
@@ -1206,10 +1219,10 @@ export type Database = {
       create_public_booking: {
         Args: {
           p_code: string
-          p_email?: string
           p_full_name: string
           p_notes?: string
           p_otp_id: string
+          p_phone: string
           p_service_id: string
           p_starts_at: string
         }
@@ -1317,7 +1330,7 @@ export type Database = {
         Returns: number
       }
       request_booking_otp: {
-        Args: { p_ip_hash?: string; p_phone: string; p_professional_id: string }
+        Args: { p_email: string; p_ip_hash?: string; p_professional_id: string }
         Returns: {
           code: string
           expires_at: string

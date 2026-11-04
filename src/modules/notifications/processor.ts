@@ -1,19 +1,23 @@
-import type { SmsResult } from "@/lib/sms";
-import { needsClientLink, renderSms, type NotificationPayload } from "./templates";
+import { needsClientLink, renderMessage, type NotificationPayload } from "./templates";
 
 export type ClaimedNotification = {
   id: string;
   template: string;
-  recipient_phone: string | null;
+  recipient_email: string | null;
   appointment_id: string | null;
   payload: unknown;
 };
+
+type SendResult = { ok: true; messageId?: string } | { ok: false; error: string };
 
 export type QueueDeps = {
   claim: (batch: number) => Promise<ClaimedNotification[]>;
   record: (id: string, result: { ok: boolean; provider: string; messageId?: string; error?: string }) => Promise<void>;
   linkFor: (appointmentId: string) => string | null;
-  sender: { name: string; send: (to: string, body: string) => Promise<SmsResult> };
+  sender: {
+    name: string;
+    send: (message: { to: string; subject: string; text: string; actionUrl?: string | null; actionLabel?: string }) => Promise<SendResult>;
+  };
 };
 
 /**
@@ -28,10 +32,17 @@ export async function processNotificationBatch(deps: QueueDeps, batch = 20) {
   for (const n of claimed) {
     const provider = deps.sender.name;
     try {
-      if (!n.recipient_phone) throw new Error("Sin teléfono de destino");
+      if (!n.recipient_email) throw new Error("Sin email de destino");
       const link = needsClientLink(n.template) && n.appointment_id ? deps.linkFor(n.appointment_id) : null;
       if (n.template.startsWith("change.") && !link) throw new Error("No se pudo generar el enlace del cliente");
-      const result = await deps.sender.send(n.recipient_phone, renderSms(n.template, n.payload as NotificationPayload, link));
+      const message = renderMessage(n.template, n.payload as NotificationPayload);
+      const result = await deps.sender.send({
+        to: n.recipient_email,
+        subject: message.subject,
+        text: message.text,
+        actionUrl: link,
+        actionLabel: message.actionLabel,
+      });
       await deps.record(n.id, result.ok ? { ok: true, provider, messageId: result.messageId } : { ok: false, provider, error: result.error });
       if (result.ok) sent++;
       else failed++;

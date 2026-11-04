@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { CircleAlert, CircleCheck, ClipboardCheck } from "lucide-react";
 import { PageHeader } from "@/components/layout/page-header";
-import { getRealSmsSender } from "@/lib/sms";
+import { getRealEmailSender } from "@/lib/email";
 import { cn } from "@/lib/utils";
 import { requireArea } from "@/modules/auth/access";
 import { buildReadiness, type ReadinessStatus } from "@/modules/salons/readiness";
@@ -19,7 +19,7 @@ export default async function AdminConfiguracionPage() {
   const items = buildReadiness({
     hasSecretKey: Boolean(process.env.SUPABASE_SECRET_KEY),
     siteUrl: process.env.NEXT_PUBLIC_SITE_URL,
-    hasSmsProvider: getRealSmsSender() !== null,
+    hasEmailProvider: getRealEmailSender() !== null,
     hasCronSecret: Boolean(process.env.CRON_SECRET),
   });
   const pending = items.filter((i) => i.status === "pending").length;

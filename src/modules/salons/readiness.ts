@@ -5,7 +5,7 @@ export type ReadinessItem = { id: string; title: string; status: ReadinessStatus
 export type ReadinessFacts = {
   hasSecretKey: boolean;
   siteUrl: string | undefined;
-  hasSmsProvider: boolean;
+  hasEmailProvider: boolean;
   hasCronSecret: boolean;
 };
 
@@ -29,20 +29,20 @@ export function buildReadiness(f: ReadinessFacts): ReadinessItem[] {
       detail: publicSite ? `Los enlaces usan ${f.siteUrl}.` : "Define NEXT_PUBLIC_SITE_URL con la dirección definitiva.",
     },
     {
-      id: "sms",
-      title: "Proveedor de SMS",
-      status: f.hasSmsProvider ? "ok" : "pending",
-      detail: f.hasSmsProvider
-        ? "Conectado."
-        : "Sin proveedor la reserva online está desactivada y los avisos a clientes quedan pendientes.",
+      id: "email",
+      title: "Proveedor de correo",
+      status: f.hasEmailProvider ? "ok" : "pending",
+      detail: f.hasEmailProvider
+        ? "Conectado. Haz una reserva de prueba para comprobar que llegan los correos."
+        : "Define BREVO_API_KEY y EMAIL_FROM_ADDRESS. Sin ellas la reserva online está desactivada y los avisos quedan pendientes.",
     },
     {
       id: "cron",
-      title: "Tarea programada de notificaciones",
+      title: "Tarea programada (recordatorios y reintentos)",
       status: f.hasCronSecret ? "manual" : "pending",
       detail: f.hasCronSecret
-        ? "CRON_SECRET configurado. Comprueba que algo llama cada pocos minutos a /api/internal/notifications/process."
-        : "Define CRON_SECRET y programa la llamada a /api/internal/notifications/process cada pocos minutos.",
+        ? "CRON_SECRET configurado. Vercel la lanza una vez al día: comprueba en su panel que se ejecuta."
+        : "Define CRON_SECRET en Vercel. Sin ella no salen los recordatorios.",
     },
     {
       id: "auth",
@@ -52,9 +52,9 @@ export function buildReadiness(f: ReadinessFacts): ReadinessItem[] {
     },
     {
       id: "smtp",
-      title: "Correo propio (SMTP)",
+      title: "Correo de invitaciones (SMTP)",
       status: "manual",
-      detail: "El correo de Supabase tiene un límite bajo de envíos: configura un SMTP propio antes de invitar a varios profesionales.",
+      detail: "Las invitaciones de Supabase tienen un límite bajo de envíos: configura un SMTP propio antes de invitar a varios profesionales.",
     },
     {
       id: "signup",
@@ -66,7 +66,7 @@ export function buildReadiness(f: ReadinessFacts): ReadinessItem[] {
       id: "legal",
       title: "Textos legales",
       status: "manual",
-      detail: "Las reservas recogen nombre y teléfono: revisa con tu asesor la política de privacidad y quién es responsable de los datos.",
+      detail: "Las reservas recogen nombre, teléfono y email: revisa con tu asesor la política de privacidad y quién es responsable de los datos.",
     },
     {
       id: "e2e",

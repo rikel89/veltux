@@ -103,14 +103,13 @@ describe("Dos personas a la vez", () => {
   it("varios clientes reservan online la misma hora: una reserva y un solo cliente nuevo", async () => {
     const otps: { otp_id: string; code: string; phone: string }[] = [];
     for (let i = 0; i < 8; i++) {
-      const phone = `+3469900000${i}`;
-      const res = await as<{ otp_id: string; code: string }>("service_role", null, "select * from public.request_booking_otp($1, $2, null)", [p.proA1, phone]);
+      const res = await as<{ otp_id: string; code: string }>("service_role", null, "select * from public.request_booking_otp($1, $2, null)", [p.proA1, `web${i}@veltux.test`]);
       if (!res.ok) throw new Error(res.error);
-      otps.push({ ...res.value[0], phone });
+      otps.push({ ...res.value[0], phone: `+3469900000${i}` });
     }
     const results = await Promise.all(
       otps.map((o) =>
-        as<{ id: string }>("service_role", null, "select public.create_public_booking($1, $2, $3, $4, 'Cliente Web') as id", [o.otp_id, o.code, s.corteA1, SLOT]),
+        as<{ id: string }>("service_role", null, "select public.create_public_booking($1, $2, $3, $4, 'Cliente Web', $5) as id", [o.otp_id, o.code, s.corteA1, SLOT, o.phone]),
       ),
     );
     expect(okCount(results)).toBe(1);
@@ -120,11 +119,11 @@ describe("Dos personas a la vez", () => {
   });
 
   it("agenda y reserva online compitiendo por el mismo hueco: gana solo una", async () => {
-    const otp = await as<{ otp_id: string; code: string }>("service_role", null, "select * from public.request_booking_otp($1, '+34699000100', null)", [p.proA1]);
+    const otp = await as<{ otp_id: string; code: string }>("service_role", null, "select * from public.request_booking_otp($1, 'web100@veltux.test', null)", [p.proA1]);
     if (!otp.ok) throw new Error(otp.error);
     const results = await Promise.all([
       as("authenticated", users.ownerA, CREATE, [s.corteA1, c.clienteA1, SLOT]),
-      as("service_role", null, "select public.create_public_booking($1, $2, $3, $4, 'Cliente Web') as id", [otp.value[0].otp_id, otp.value[0].code, s.corteA1, SLOT]),
+      as("service_role", null, "select public.create_public_booking($1, $2, $3, $4, 'Cliente Web', '+34699000100') as id", [otp.value[0].otp_id, otp.value[0].code, s.corteA1, SLOT]),
     ]);
     expect(okCount(results)).toBe(1);
   });
@@ -160,21 +159,21 @@ describe("Límites bajo carga", () => {
     expect(rows[0].n).toBe(3);
   });
 
-  it("peticiones simultáneas de códigos respetan el límite por teléfono", async () => {
+  it("peticiones simultáneas de códigos respetan el límite por email", async () => {
     const results = await Promise.all(
-      Array.from({ length: 12 }, () => as("service_role", null, "select * from public.request_booking_otp($1, '+34699000200', null)", [p.proA1])),
+      Array.from({ length: 12 }, () => as("service_role", null, "select * from public.request_booking_otp($1, 'web200@veltux.test', null)", [p.proA1])),
     );
     expect(okCount(results)).toBe(3);
     expect(errorsOf(results)).toEqual(["TOO_MANY_REQUESTS"]);
   });
 
   it("probar códigos en paralelo no da más de 5 intentos", async () => {
-    const otp = await as<{ otp_id: string; code: string }>("service_role", null, "select * from public.request_booking_otp($1, '+34699000300', null)", [p.proA1]);
+    const otp = await as<{ otp_id: string; code: string }>("service_role", null, "select * from public.request_booking_otp($1, 'web300@veltux.test', null)", [p.proA1]);
     if (!otp.ok) throw new Error(otp.error);
     const wrong = otp.value[0].code === "000000" ? "111111" : "000000";
     const results = await Promise.all(
       Array.from({ length: 15 }, () =>
-        as<{ id: string | null }>("service_role", null, "select public.create_public_booking($1, $2, $3, $4, 'Intruso') as id", [otp.value[0].otp_id, wrong, s.corteA1, SLOT]),
+        as<{ id: string | null }>("service_role", null, "select public.create_public_booking($1, $2, $3, $4, 'Intruso', '+34699000300') as id", [otp.value[0].otp_id, wrong, s.corteA1, SLOT]),
       ),
     );
     expect(okCount(results)).toBe(5);
@@ -186,11 +185,11 @@ describe("Límites bajo carga", () => {
   });
 
   it("un código correcto no sirve dos veces aunque se use a la vez", async () => {
-    const otp = await as<{ otp_id: string; code: string }>("service_role", null, "select * from public.request_booking_otp($1, '+34699000400', null)", [p.proA1]);
+    const otp = await as<{ otp_id: string; code: string }>("service_role", null, "select * from public.request_booking_otp($1, 'web400@veltux.test', null)", [p.proA1]);
     if (!otp.ok) throw new Error(otp.error);
     const starts = ["09:00", "10:00", "11:00", "12:00"].map((t) => `2027-03-01 ${t}+00`);
     const results = await Promise.all(
-      starts.map((start) => as("service_role", null, "select public.create_public_booking($1, $2, $3, $4, 'Doble') as id", [otp.value[0].otp_id, otp.value[0].code, s.corteA1, start])),
+      starts.map((start) => as("service_role", null, "select public.create_public_booking($1, $2, $3, $4, 'Doble', '+34699000400') as id", [otp.value[0].otp_id, otp.value[0].code, s.corteA1, start])),
     );
     expect(okCount(results)).toBe(1);
     expect(errorsOf(results)).toEqual(["OTP_EXPIRED"]);
@@ -199,8 +198,8 @@ describe("Límites bajo carga", () => {
   it("varios procesos de la cola nunca reclaman el mismo mensaje", async () => {
     for (let i = 0; i < 30; i++) {
       await pool.query(
-        `insert into public.notifications (salon_id, template, recipient_phone, idempotency_key, payload)
-         values ($1, 'appointment.created', '+34600000000', $2, '{"starts_at":"2027-03-01T09:00:00Z"}')`,
+        `insert into public.notifications (salon_id, channel, template, recipient_email, idempotency_key, payload)
+         values ($1, 'email', 'appointment.created', 'cola@veltux.test', $2, '{"starts_at":"2027-03-01T09:00:00Z"}')`,
         [salons.a, `prueba:${i}`],
       );
     }

@@ -8,7 +8,7 @@ export const slotsQuerySchema = z
 
 export const otpRequestSchema = z.object({
   professionalId: z.uuid(),
-  phone: phoneSchema,
+  email: emailSchema(),
 });
 
 export const bookingRequestSchema = z.object({
@@ -20,7 +20,7 @@ export const bookingRequestSchema = z.object({
   serviceId: z.uuid(),
   startsAt: z.iso.datetime({ offset: true }),
   fullName: z.string().trim().min(2, "Indica tu nombre").max(120, "Máximo 120 caracteres"),
-  email: optional(emailSchema()),
+  phone: phoneSchema,
   notes: optional(z.string().trim().max(500, "Máximo 500 caracteres")),
 });
 
@@ -68,8 +68,10 @@ export const PUBLIC_ERRORS = {
   NOT_BOOKABLE: { status: 404, message: "Este profesional no acepta reservas online ahora mismo." },
   INVALID_PHONE: { status: 400, message: "Escribe un teléfono válido." },
   TOO_MANY_REQUESTS: { status: 429, message: "Has pedido demasiados códigos. Espera unos minutos y vuelve a intentarlo." },
-  SMS_UNAVAILABLE: { status: 503, message: "La reserva online no está disponible en este momento. Llama al establecimiento." },
-  SMS_FAILED: { status: 502, message: "No hemos podido enviar el SMS. Revisa el número e inténtalo de nuevo." },
+  BOOKING_UNAVAILABLE: { status: 503, message: "La reserva online no está disponible en este momento. Llama al establecimiento." },
+  EMAIL_FAILED: { status: 502, message: "No hemos podido enviar el correo. Revisa la dirección e inténtalo de nuevo." },
+  INVALID_EMAIL: { status: 400, message: "Escribe un email válido." },
+  TOO_MANY_BOOKINGS: { status: 429, message: "Ya tienes varias citas pendientes con este profesional. Para pedir otra, contacta con el establecimiento." },
   OTP_INVALID: { status: 400, message: "El código no es correcto." },
   OTP_EXPIRED: { status: 410, message: "El código ha caducado. Pide uno nuevo." },
   OTP_LOCKED: { status: 423, message: "Demasiados intentos con este código. Pide uno nuevo." },

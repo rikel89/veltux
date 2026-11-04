@@ -11,8 +11,8 @@ export const clientSchema = z.object({
 
 export type ClientInput = z.infer<typeof clientSchema>;
 
-/** Alta rápida desde la agenda: solo nombre y teléfono. */
-export const quickClientSchema = clientSchema.pick({ fullName: true, phone: true });
+/** Alta rápida desde la agenda: nombre, teléfono y email opcional. */
+export const quickClientSchema = clientSchema.pick({ fullName: true, phone: true, email: true });
 
 export const clientIdSchema = z.object({ clientId: z.uuid() });
 

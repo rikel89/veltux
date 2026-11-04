@@ -49,7 +49,7 @@ export function DayControls({ date, blocked, activeCount }: { date: string; bloc
         <form action={cancel} className="space-y-3 rounded-xl border border-red-200 bg-red-50 p-4">
           <input type="hidden" name="date" value={date} />
           <p className="text-sm font-semibold text-red-800">¿Cancelar {activeCount === 1 ? "la cita" : `las ${activeCount} citas`} de esta jornada?</p>
-          <p className="text-xs text-red-700">Cada cliente recibirá un aviso por SMS en cuanto haya un proveedor conectado. No se puede deshacer.</p>
+          <p className="text-xs text-red-700">Los clientes con email recibirán un aviso. No se puede deshacer.</p>
           <FormField id="bulk-reason" name="reason" label="Motivo (privado, opcional)" maxLength={300} />
           <FormMessage state={cancelState} />
           <div className="flex justify-end gap-2">

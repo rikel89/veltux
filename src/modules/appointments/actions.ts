@@ -3,6 +3,7 @@
 import { refresh } from "next/cache";
 import { zonedTimeToUtc } from "@/lib/datetime";
 import { fieldErrors, type FormState } from "@/lib/validations/common";
+import { flushNotificationsLater } from "@/modules/notifications/queue";
 import { requireMyProfessional } from "@/modules/professionals/context";
 import { newAppointmentSchema, rescheduleSchema, statusChangeSchema } from "./schemas";
 
@@ -48,6 +49,7 @@ export async function createAppointment(_prev: FormState, formData: FormData): P
   });
   if (error) return dbError(error.message, "No se pudo crear la cita.");
 
+  flushNotificationsLater();
   refresh();
   return { ok: true, message: "Cita creada." };
 }
@@ -68,6 +70,7 @@ export async function rescheduleAppointment(_prev: FormState, formData: FormData
   });
   if (error) return dbError(error.message, "No se pudo mover la cita.");
 
+  flushNotificationsLater();
   refresh();
   return { ok: true, message: "Cita movida." };
 }
@@ -95,6 +98,7 @@ export async function changeAppointmentStatus(_prev: FormState, formData: FormDa
   });
   if (error) return dbError(error.message, "No se pudo cambiar el estado.");
 
+  flushNotificationsLater();
   refresh();
   return { ok: true, message: STATUS_MESSAGE[v.status] };
 }

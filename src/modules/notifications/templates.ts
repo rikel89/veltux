@@ -49,29 +49,54 @@ function when(instant: string | undefined, tz: string): string {
   return `${formatLongDate(toLocalDateKey(new Date(instant), tz)).toLowerCase()} a las ${formatTime(instant, tz)}`;
 }
 
-/** Texto del SMS. No incluye datos privados: ni notas ni motivos. */
-export function renderSms(template: string, p: NotificationPayload, link?: string | null): string {
+export type RenderedMessage = { subject: string; text: string; actionLabel?: string };
+
+/** Asunto y texto del email. No incluye datos privados: ni notas ni motivos. */
+export function renderMessage(template: string, p: NotificationPayload): RenderedMessage {
   const tz = p.timezone ?? "Europe/Madrid";
   const at = when(p.starts_at, tz);
   const salon = p.salon_name ?? "Tu establecimiento";
-  const tail = link ? ` Gestiónala: ${link}` : "";
 
   switch (template) {
     case "appointment.created":
-      return `${salon}: cita confirmada el ${at} con ${p.professional_name} (${p.service_name}).${tail}`;
+      return {
+        subject: `Cita confirmada en ${salon}`,
+        text: `Tu cita es el ${at} con ${p.professional_name} (${p.service_name}).`,
+        actionLabel: "Ver o cancelar mi cita",
+      };
     case "appointment.reminder":
-      return `${salon}: te recordamos tu cita el ${at} con ${p.professional_name}.${tail}`;
+      return {
+        subject: `Recordatorio de tu cita en ${salon}`,
+        text: `Te recordamos tu cita del ${at} con ${p.professional_name}.`,
+        actionLabel: "Ver o cancelar mi cita",
+      };
     case "appointment.cancelled":
-      return `${salon}: tu cita del ${at} ha sido cancelada.`;
+      return { subject: `Cita cancelada en ${salon}`, text: `Tu cita del ${at} ha sido cancelada.` };
     case "appointment.rescheduled":
-      return `${salon}: tu cita ha cambiado al ${at} con ${p.professional_name}.${tail}`;
+      return {
+        subject: `Tu cita en ${salon} ha cambiado`,
+        text: `Tu cita ha cambiado al ${at} con ${p.professional_name}.`,
+        actionLabel: "Ver o cancelar mi cita",
+      };
     case "appointment.reassigned":
-      return `${salon}: tu cita será el ${at} con ${p.professional_name} (${p.service_name}).${tail}`;
+      return {
+        subject: `Tu cita en ${salon} ha cambiado`,
+        text: `Tu cita será el ${at} con ${p.professional_name} (${p.service_name}).`,
+        actionLabel: "Ver o cancelar mi cita",
+      };
     case "change.reschedule_proposed":
-      return `${salon}: ${p.professional_name} te propone cambiar tu cita al ${when(p.proposed_starts_at, tz)}. Responde aquí: ${link ?? ""}`.trim();
+      return {
+        subject: `${p.professional_name} te propone otra hora`,
+        text: `Te propone cambiar tu cita en ${salon} al ${when(p.proposed_starts_at, tz)}. Si no respondes, tu cita seguirá como está.`,
+        actionLabel: "Responder",
+      };
     case "change.reassignment_proposed": {
       const price = p.proposed_price_cents === undefined ? "" : `, ${formatMoney(p.proposed_price_cents, p.currency)}`;
-      return `${salon}: te proponemos tu cita del ${when(p.proposed_starts_at, tz)} con ${p.target_name} (${p.proposed_service_name}${price}). Responde aquí: ${link ?? ""}`.trim();
+      return {
+        subject: `Propuesta de cambio para tu cita en ${salon}`,
+        text: `Te proponemos tu cita del ${when(p.proposed_starts_at, tz)} con ${p.target_name} (${p.proposed_service_name}${price}). Si no respondes, tu cita seguirá como está.`,
+        actionLabel: "Responder",
+      };
     }
     default:
       throw new Error(`Plantilla desconocida: ${template}`);

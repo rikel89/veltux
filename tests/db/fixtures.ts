@@ -86,10 +86,10 @@ export async function seedScenario(db: Db) {
       ('${s.corteA2}', '${salons.a}', '${p.proA2}', 'Corte + barba', 45, 2200),
       ('${s.corteB1}', '${salons.b}', '${p.proB1}', 'Corte mujer',   60, 3000);
 
-    insert into public.clients (id, salon_id, professional_id, full_name, phone, notes) values
-      ('${c.clienteA1}', '${salons.a}', '${p.proA1}', 'Cliente de Carlos', '+34611111111', 'Alergia a tintes'),
-      ('${c.clienteA2}', '${salons.a}', '${p.proA2}', 'Cliente de Javier', '+34611111111', 'Nota privada'),
-      ('${c.clienteB1}', '${salons.b}', '${p.proB1}', 'Cliente de Lucía',  '+34633333333', null);
+    insert into public.clients (id, salon_id, professional_id, full_name, phone, email, notes) values
+      ('${c.clienteA1}', '${salons.a}', '${p.proA1}', 'Cliente de Carlos', '+34611111111', 'carlos.cliente@veltux.test', 'Alergia a tintes'),
+      ('${c.clienteA2}', '${salons.a}', '${p.proA2}', 'Cliente de Javier', '+34611111111', 'javier.cliente@veltux.test', 'Nota privada'),
+      ('${c.clienteB1}', '${salons.b}', '${p.proB1}', 'Cliente de Lucía',  '+34633333333', 'lucia.cliente@veltux.test', null);
 
     insert into public.appointments (id, salon_id, professional_id, client_id, service_id, starts_at, ends_at) values
       ('${a.citaA1}', '${salons.a}', '${p.proA1}', '${c.clienteA1}', '${s.corteA1}',

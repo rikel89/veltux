@@ -3,6 +3,7 @@
 import { refresh } from "next/cache";
 import { zonedTimeToUtc } from "@/lib/datetime";
 import { fieldErrors, type FormState } from "@/lib/validations/common";
+import { flushNotificationsLater } from "@/modules/notifications/queue";
 import { requireMyProfessional, type MyProfessional } from "@/modules/professionals/context";
 import {
   blockDaySchema,
@@ -52,6 +53,7 @@ export async function blockDay(_prev: FormState, formData: FormData): Promise<Fo
     p_reason: parsed.data.reason ?? undefined,
   });
   if (error) return dbError(error.message, "No se pudo bloquear la jornada.");
+  flushNotificationsLater();
   refresh();
   return { ok: true, message: "Jornada bloqueada: ya no se ofrecen huecos ese día. Las citas siguen igual." };
 }
@@ -71,6 +73,7 @@ export async function cancelDayAppointments(_prev: FormState, formData: FormData
     p_reason: v.reason ?? undefined,
   });
   if (error) return dbError(error.message, "No se pudieron cancelar las citas.");
+  flushNotificationsLater();
   refresh();
   return { ok: true, message: data === 1 ? "Cita cancelada." : `${data} citas canceladas.` };
 }
@@ -88,6 +91,7 @@ export async function proposeReschedule(_prev: FormState, formData: FormData): P
     p_message: v.message ?? undefined,
   });
   if (error) return dbError(error.message, "No se pudo enviar la propuesta.");
+  flushNotificationsLater();
   refresh();
   return { ok: true, message: "Propuesta registrada. La cita no cambia hasta que el cliente acepte." };
 }
@@ -105,6 +109,7 @@ export async function requestReassignment(_prev: FormState, formData: FormData):
     p_message: v.message ?? undefined,
   });
   if (error) return dbError(error.message, "No se pudo enviar la solicitud.");
+  flushNotificationsLater();
   refresh();
   return { ok: true, message: "Solicitud enviada. Después de que tu compañero acepte, decidirá el cliente." };
 }
@@ -122,6 +127,7 @@ export async function respondReassignment(_prev: FormState, formData: FormData):
     p_service_id: v.serviceId ?? undefined,
   });
   if (error) return dbError(error.message, "No se pudo registrar tu respuesta.");
+  flushNotificationsLater();
   refresh();
   return { ok: true, message: v.decision === "accept" ? "Aceptada. Ahora debe confirmarla el cliente." : "Solicitud rechazada." };
 }
@@ -134,6 +140,7 @@ export async function withdrawRequest(_prev: FormState, formData: FormData): Pro
 
   const { error } = await me.supabase.rpc("cancel_my_change_request", { p_request_id: parsed.data.requestId });
   if (error) return dbError(error.message, "No se pudo retirar la propuesta.");
+  flushNotificationsLater();
   refresh();
   return { ok: true, message: "Propuesta retirada." };
 }

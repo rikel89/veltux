@@ -125,7 +125,7 @@ export default async function OwnerDashboardPage() {
           </h2>
           <CopyBookingLink path={`/${salon.slug}`} />
           <p className="mt-3 text-xs text-neutral-500">
-            Tus clientes eligen profesional, servicio y hora, y confirman la reserva con un código por SMS.
+            Tus clientes eligen profesional, servicio y hora, y confirman la reserva con un código por email.
           </p>
         </section>
       </div>

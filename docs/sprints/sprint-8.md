@@ -24,9 +24,28 @@
 - [x] Página de error en castellano con una referencia, sin detalles técnicos.
 - [x] Cabeceras de seguridad. `Referrer-Policy` evita que el enlace firmado de `/cita` se filtre a otras webs.
 
+### H6 · Reservar y recibir avisos por email (cliente)
+- [x] La reserva pide nombre, teléfono y email, y un código de 6 cifras enviado por correo. Sin coste de mensajería.
+- [x] El código verifica el email, no el teléfono: una reserva nunca cambia los datos de una ficha existente, y cada cita guarda su email de contacto.
+- [x] Límites: 3 códigos por email cada 15 minutos, 10 por IP cada hora, 5 intentos por código y 3 citas futuras por email o teléfono con cada profesional.
+- [x] Confirmación, cancelación, cambios y propuestas salen al momento. Recordatorios y reintentos, con la tarea diaria de Vercel: el recordatorio llega entre 0 y 24 h antes.
+- [x] Sin email en la ficha ni en la cita no se encola nada. Sin proveedor los mensajes siguen pendientes y, en producción, la reserva online se desactiva.
+
+## Variables del correo
+
+| Variable | Dónde | Qué |
+| --- | --- | --- |
+| `BREVO_API_KEY` | `.env.local` y Vercel | Clave de API de Brevo (secreta) |
+| `EMAIL_FROM_ADDRESS` | `.env.local` y Vercel | Remitente verificado en Brevo |
+| `EMAIL_FROM_NAME` | Opcional | Por defecto, VELTUX |
+| `CRON_SECRET` | Vercel | Protege la tarea diaria de `vercel.json` |
+
+Sin clave de Brevo, en desarrollo el correo se escribe en la consola del servidor como `[Email simulado]`.
+
 ## Migración
 
-`supabase/migrations/20261109090000_sprint8_platform_stats.sql`: `admin_platform_stats(integer)`.
+- `supabase/migrations/20261109090000_sprint8_platform_stats.sql`: `admin_platform_stats(integer)`.
+- `supabase/migrations/20261110090000_email_channel.sql`: código y avisos por email.
 
 ## Pruebas
 
@@ -46,4 +65,4 @@ npm run test:concurrency
 
 ## Antes del piloto
 
-Ver `/admin/configuracion`. Decisiones abiertas: proveedor de SMS, tarea programada, SMTP propio y textos legales.
+Ver `/admin/configuracion`. Pendiente: cuenta de Brevo, `CRON_SECRET`, SMTP de las invitaciones y textos legales. El aviso de entrega de Brevo aún no está conectado: los mensajes llegan a «Enviada», no a «Entregada».

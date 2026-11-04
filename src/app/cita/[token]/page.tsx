@@ -134,7 +134,7 @@ async function AppointmentContent({ params }: { params: PageProps<"/cita/[token]
             )}
           </p>
           {p.type === "reassignment" && (
-            <p className="mt-2 text-xs text-muted-foreground">Si aceptas, compartiremos tu nombre y teléfono con {p.target_name} para atender tu cita.</p>
+            <p className="mt-2 text-xs text-muted-foreground">Si aceptas, compartiremos tu nombre y teléfono con {p.target_name} para atender tu cita. Tu email solo se usará para los avisos de esta cita.</p>
           )}
           {p.message && p.type === "reschedule" && <p className="mt-2 text-sm italic">«{p.message}»</p>}
           <p className="mt-2 text-xs text-muted-foreground">Si no respondes o rechazas, tu cita seguirá como está.</p>

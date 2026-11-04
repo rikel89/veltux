@@ -42,7 +42,7 @@ export async function addClient(_prev: FormState, formData: FormData): Promise<F
 export type QuickClientResult = { ok: true; client: { id: string; fullName: string; phone: string } } | FormState;
 
 /** Alta rápida desde la agenda (nombre + teléfono); devuelve el cliente para seleccionarlo. */
-export async function createQuickClient(input: { fullName: string; phone: string }): Promise<QuickClientResult> {
+export async function createQuickClient(input: { fullName: string; phone: string; email: string }): Promise<QuickClientResult> {
   const { supabase, ctx } = await requireMyProfessional();
   if (!ctx) return { error: "No tienes ficha de profesional." };
   if (ctx.status !== "active") return READ_ONLY;
@@ -57,6 +57,7 @@ export async function createQuickClient(input: { fullName: string; phone: string
       professional_id: ctx.professionalId,
       full_name: parsed.data.fullName,
       phone: parsed.data.phone,
+      email: parsed.data.email,
     })
     .select("id, full_name, phone")
     .single();

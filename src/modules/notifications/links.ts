@@ -5,7 +5,7 @@ import { getSiteUrl } from "@/lib/site";
 
 /**
  * Enlace firmado del cliente: /cita/{id}.{firma}. No se guarda en ninguna
- * tabla: los SMS pendientes y el historial del profesional no contienen el token.
+ * tabla: los mensajes pendientes y el historial del profesional no contienen el token.
  */
 function secret(): string | null {
   return process.env.APPOINTMENT_LINK_SECRET || process.env.SUPABASE_SECRET_KEY || null;

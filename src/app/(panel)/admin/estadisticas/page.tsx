@@ -87,9 +87,9 @@ export default async function AdminStatsPage({ searchParams }: PageProps<"/admin
           </dl>
         </section>
 
-        <section className="rounded-2xl border border-border bg-card p-5 shadow-card sm:p-6" aria-labelledby="estado-sms">
-          <h2 id="estado-sms" className="text-base font-bold">
-            Notificaciones por SMS
+        <section className="rounded-2xl border border-border bg-card p-5 shadow-card sm:p-6" aria-labelledby="estado-avisos">
+          <h2 id="estado-avisos" className="text-base font-bold">
+            Avisos a clientes
           </h2>
           <dl className="mt-4 divide-y divide-border text-sm">
             {[

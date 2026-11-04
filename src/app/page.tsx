@@ -7,7 +7,7 @@ const FEATURES = [
   { icon: CalendarDays, title: "Agenda inteligente" },
   { icon: Users, title: "Profesionales independientes" },
   { icon: CalendarCheck, title: "Reservas online" },
-  { icon: BellRing, title: "Notificaciones SMS" },
+  { icon: BellRing, title: "Avisos automáticos" },
   { icon: BarChart3, title: "Control del negocio" },
 ];
 

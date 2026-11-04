@@ -24,7 +24,7 @@ export function ClientPicker({
   const [results, setResults] = useState<ClientSummary[]>([]);
   const [searching, setSearching] = useState(false);
   const [creating, setCreating] = useState(false);
-  const [draft, setDraft] = useState({ fullName: "", phone: "" });
+  const [draft, setDraft] = useState({ fullName: "", phone: "", email: "" });
   const [draftErrors, setDraftErrors] = useState<Record<string, string>>({});
   const [saving, startSaving] = useTransition();
 
@@ -90,6 +90,23 @@ export function ClientPicker({
           />
           {draftErrors.phone && <p className="text-xs font-medium text-destructive">{draftErrors.phone}</p>}
         </div>
+        <div className="space-y-1.5">
+          <Label htmlFor="quick-email">Email (opcional)</Label>
+          <Input
+            id="quick-email"
+            type="email"
+            inputMode="email"
+            value={draft.email}
+            onChange={(e) => setDraft({ ...draft, email: e.target.value })}
+            className="h-11 rounded-xl bg-white"
+            aria-invalid={Boolean(draftErrors.email)}
+          />
+          {draftErrors.email ? (
+            <p className="text-xs font-medium text-destructive">{draftErrors.email}</p>
+          ) : (
+            <p className="text-xs text-muted-foreground">Sin email no recibirá confirmaciones ni recordatorios.</p>
+          )}
+        </div>
         {draftErrors._ && <p className="text-xs font-medium text-destructive">{draftErrors._}</p>}
         <div className="flex justify-end gap-2">
           <Button type="button" variant="ghost" size="sm" onClick={() => setCreating(false)}>
@@ -105,7 +122,7 @@ export function ClientPicker({
                 const result = await createQuickClient(draft);
                 if ("client" in result) {
                   setCreating(false);
-                  setDraft({ fullName: "", phone: "" });
+                  setDraft({ fullName: "", phone: "", email: "" });
                   setDraftErrors({});
                   onChange(result.client);
                 } else {
@@ -164,7 +181,7 @@ export function ClientPicker({
         className="bg-white"
         onClick={() => {
           setCreating(true);
-          setDraft({ fullName: /\d/.test(query) ? "" : query, phone: /\d/.test(query) ? query : "" });
+          setDraft({ fullName: /\d/.test(query) ? "" : query, phone: /\d/.test(query) ? query : "", email: "" });
         }}
       >
         <UserPlus /> Nuevo cliente
