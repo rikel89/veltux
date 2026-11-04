@@ -1116,6 +1116,7 @@ export type Database = {
     }
     Functions: {
       accept_my_invitations: { Args: never; Returns: number }
+      admin_platform_stats: { Args: { p_days?: number }; Returns: Json }
       admin_salon_overview: {
         Args: never
         Returns: {

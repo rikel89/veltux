@@ -18,7 +18,7 @@ import {
 import type { Area } from "@/modules/auth/access-rules";
 
 /** Sprint en curso: las secciones de sprints posteriores muestran su etiqueta. */
-export const CURRENT_SPRINT = 7;
+export const CURRENT_SPRINT = 8;
 
 export type NavItem = {
   label: string;
@@ -190,7 +190,7 @@ export const NAVS: Record<Area, AreaNav> = {
         href: "/admin/configuracion",
         icon: Settings,
         sprint: 8,
-        description: "Parámetros globales de la plataforma.",
+        description: "Preparación del piloto y estado de la plataforma.",
       },
     ],
     mobilePrimary: [

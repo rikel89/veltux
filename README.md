@@ -219,9 +219,19 @@ Detalle: [docs/sprints/sprint-7.md](docs/sprints/sprint-7.md).
 - [x] **Resumen**: ocupación, tiempo reservado y tiempo libre; ocupación de la semana en el dashboard
 - [x] **Privacidad**: franjas anónimas, sin clientes, servicios, precios ni motivos
 
-## Sprint 8 · Pruebas y piloto (propuesta)
+## Sprint 8 · Entregado
 
-1. **Flujos con sesión real** en E2E contra un Supabase local: propietario, profesional y cliente.
-2. **Concurrencia real**: dos reservas simultáneas al mismo hueco, con varias conexiones.
-3. **Estadísticas y configuración de la plataforma** para el administrador.
-4. **Preparación del piloto**: lista de comprobación, datos iniciales, SMTP propio, proveedor de SMS y tarea programada.
+Detalle: [docs/sprints/sprint-8.md](docs/sprints/sprint-8.md).
+
+- [x] **Concurrencia real** con PostgreSQL embebido (`npm run test:concurrency`), sin Docker
+- [x] **Estadísticas** agregadas y **preparación del piloto** para el administrador
+- [x] Página de error en castellano y cabeceras de seguridad
+
+**Pendiente de decisión:** proveedor de SMS, tarea programada, SMTP propio y textos legales.
+
+## Sprint 9 · Suscripciones y comercialización (propuesta)
+
+1. **Stripe Billing**: plan por licencia, alta de suscripción y método de pago.
+2. **Webhooks** idempotentes que sincronizan estado y cupo de licencias.
+3. **Pantallas** de Suscripción para propietario y administrador.
+4. **Pruebas** con el modo de pruebas de Stripe.

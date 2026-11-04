@@ -18,7 +18,7 @@ import { pgcrypto } from "@electric-sql/pglite/contrib/pgcrypto";
 const MIGRATIONS_DIR = join(process.cwd(), "supabase", "migrations");
 export const SEED_FILE = join(process.cwd(), "supabase", "seed.sql");
 
-const SUPABASE_STUB = /* sql */ `
+export const SUPABASE_STUB = /* sql */ `
   create schema auth;
   create schema extensions;
 
